@@ -1,10 +1,9 @@
-import { Avatar, Badge, Button, IconButton } from "@material-tailwind/react";
-import { Routes, Route, Link } from "react-router-dom";
-import Login from "./pages/auth/Login";
-import Signup from "./pages/auth/Signup";
-import Home from "./pages/Home";
+import { Routes, Route } from "react-router-dom";
+import Login from "@/pages/auth/Login";
+import Signup from "@/pages/auth/Signup";
+import Home from "@/pages/Home";
 import Header from "@/components/common/Header";
-import CreateArticle from "./components/dashboard/createArticle";
+import CreateArticle from "@/components/dashboard/user/createArticle";
 
 function App() {
   return (
