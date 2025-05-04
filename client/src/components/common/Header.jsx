@@ -37,7 +37,7 @@ export default function Header() {
           as="li"
           variant="small"
           color="blue-gray"
-          className="p-1 font-normal"
+          className="p-1 font-bold"
         >
           <Link
             to={item.href}
@@ -51,12 +51,13 @@ export default function Header() {
   );
 
   return (
-    <Navbar className="sticky top-0 z-10 h-max max-w-full shadow-none">
-      <div className="max-w-5xl mx-auto flex items-center justify-between rounded-[30px] px-4 py-2 lg:px-8 lg:py-4 shadow-lg">
+    <Navbar className="w-full sm:max-w-md md:max-w-2xl lg:max-w-3xl xl:max-w-5xl fixed top-5 left-1/2 -translate-x-1/2 z-10 mx-auto shadow-none bg-white/80 border-0 backdrop-blur-md transition-all rounded-none sm:rounded-[40px] p-0">
+      <div className="flex items-center justify-between  px-4 py-2 lg:px-8 lg:py-4 max-w-5xl ">
         <Typography
-          className="mr-4 cursor-pointer py-1.5 font-medium text-blue-gray-900"
+          className="mr-4 cursor-pointer py-1.5 font-semibold text-blue-gray-900"
           variant="h5"
           onClick={() => navigate("/")}
+          textGradient
         >
           Article Post
         </Typography>
@@ -77,7 +78,7 @@ export default function Header() {
             <Button
               variant="gradient"
               size="sm"
-              className="hidden lg:inline-block"
+              className="hidden lg:inline-block font-semibold"
               onClick={() => navigate("/signup")}
             >
               <span>Sign in</span>
@@ -99,7 +100,7 @@ export default function Header() {
       </div>
       <MobileNav open={openNav}>
         {navList}
-        <div className="flex items-center gap-x-1">
+        <div className="flex items-center gap-x-1 font-semibold">
           <Button
             fullWidth
             variant="text"
