@@ -1,4 +1,4 @@
-const asyncHandler = (requestHandler = async (req, res, next) => {
+const asyncHandler = (requestHandler) => async (req, res, next) => {
   try {
     return await requestHandler(req, res, next);
   } catch (error) {
@@ -7,6 +7,6 @@ const asyncHandler = (requestHandler = async (req, res, next) => {
       message: error.message || "Internal Server Error",
     });
   }
-});
+};
 
 export default asyncHandler;
