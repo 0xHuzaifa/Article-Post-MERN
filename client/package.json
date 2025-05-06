@@ -20,6 +20,7 @@
     "@lexical/table": "^0.31.0",
     "@material-tailwind/react": "^2.1.10",
     "@reduxjs/toolkit": "^2.7.0",
+    "axios": "^1.9.0",
     "lexical": "^0.31.0",
     "lucide-react": "^0.506.0",
     "react": "^19.0.0",

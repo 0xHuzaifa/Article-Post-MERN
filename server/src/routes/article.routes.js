@@ -15,7 +15,7 @@ const route = express.Router();
 
 // Public routes
 // These routes are accessible without authentication
-route.get("/articles", getPublishedArticles);
+route.get("/all-articles", getPublishedArticles);
 route.get("/unpublished-articles", getUnpublishedArticles);
 route.post("/specific-article/:slug", getSpecificArticle);
 

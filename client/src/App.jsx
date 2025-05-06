@@ -6,8 +6,16 @@ import CreateArticle from "@/components/dashboard/user/createArticle";
 import Layout from "@/components/layout/layout";
 import ArticleFeed from "@/pages/ArticleFeed";
 import ArticleDetail from "@/components/common/ArticleDetail";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { getAllArticles } from "@/redux/slices/articleSlice";
 
 function App() {
+  const dispatch = useDispatch();
+  // useEffect(() => {
+  //   dispatch(getAllArticles());
+  // }, []);
+
   return (
     <div>
       <Routes>
