@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "@/axios/api";
-
+import axios from "axios";
 const initialState = {
   isLoading: false,
   isError: false,
@@ -11,9 +11,10 @@ const getAllArticles = createAsyncThunk(
   "/articles/all-articles",
   async (_, { rejectWithValue }) => {
     try {
+      console.log("running slice");
       const res = await api.get("/articles/all-articles");
-      console.log(res);
-      return res;
+      console.log(res.data);
+      return res.data.data;
     } catch (error) {
       return rejectWithValue(error);
     }

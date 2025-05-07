@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import Login from "@/pages/auth/Login";
-import Signup from "@/pages/auth/Signup";
+import { Signup } from "@/pages/auth/Signup";
 import Home from "@/pages/Home";
 import CreateArticle from "@/components/dashboard/user/createArticle";
 import Layout from "@/components/layout/layout";
@@ -12,9 +12,9 @@ import { getAllArticles } from "@/redux/slices/articleSlice";
 
 function App() {
   const dispatch = useDispatch();
-  // useEffect(() => {
-  //   dispatch(getAllArticles());
-  // }, []);
+  useEffect(() => {
+    dispatch(getAllArticles());
+  }, []);
 
   return (
     <div>

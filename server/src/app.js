@@ -2,6 +2,7 @@ import express from "express";
 import corsConfig from "./configs/cors.config.js";
 import cookieParser from "cookie-parser";
 import errorHandler from "./middleware/errHandler.middleware.js";
+// import cors from "cors";
 
 export const app = express();
 
@@ -9,6 +10,7 @@ export const app = express();
 app.use(express.json({ limit: "16kb" })); // Limit the size of JSON payloads to 16kb
 app.use(express.urlencoded({ extended: true, limit: "16kb" })); // Pars URL-encoded bodies
 app.use(corsConfig());
+// app.use(cors());
 app.use(cookieParser());
 
 // Error Handler

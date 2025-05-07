@@ -91,19 +91,19 @@ export default function Header() {
             onClick={() => setOpenNav(!openNav)}
           >
             {openNav ? (
-              <XMarkIcon className="h-6 w-6" />
+              <XMarkIcon className="h-6 w-6 text-black font-medium" />
             ) : (
-              <Bars3Icon className="h-6 w-6" />
+              <Bars3Icon className="h-6 w-6 text-black font-medium" />
             )}
           </IconButton>
         </div>
       </div>
-      <MobileNav open={openNav}>
-        {navList}
-        <div className="flex items-center gap-x-1 font-semibold">
+      <MobileNav open={openNav} className="">
+        <div className="px-2">{navList}</div>
+        <div className="flex items-center justify-center gap-x-1 font-semibold px-3 py-0">
           <Button
             fullWidth
-            variant="text"
+            variant="outlined"
             size="sm"
             onClick={() => navigate("/login")}
           >
