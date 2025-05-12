@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import ApiError from "../utils/ApiError.js";
+
 const UserSchema = new Schema(
   {
     username: {
@@ -61,7 +61,7 @@ UserSchema.methods.generateAccessTokens = function () {
 
 UserSchema.methods.generateRefreshTokens = function () {
   const refreshToken = jwt.sign(
-    { id: this._id, role: this.role, name: this.username },
+    { id: this._id },
     process.env.JWT_REFRESH_TOKEN_SECRET_KEY,
     { expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRY }
   );

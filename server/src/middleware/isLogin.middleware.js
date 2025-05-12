@@ -19,6 +19,7 @@ const isLogin = asyncHandler((req, res, next) => {
     } catch (error) {
       throw new ApiError(401, "Invalid token");
     }
+    next();
   } catch (error) {
     next(error);
   }

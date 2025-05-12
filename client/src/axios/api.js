@@ -7,6 +7,18 @@ const api = axios.create({
   withCredentials: true, // Include credentials (cookies) in requests
 });
 
+// Define public routes that don't need authentication
+const publicRoutes = [
+  "/auth/login",
+  "/auth/register",
+  // Add other public endpoints as needed
+];
+
+// Helper function to check if a URL belongs to a public route
+const isPublicRoute = (url) => {
+  return publicRoutes.some((route) => url.includes(route));
+};
+
 let isRefreshing = false;
 let failedQueue = [];
 
@@ -26,11 +38,16 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Skip retry if not 401, already retried, or refresh endpoint
+    // Skip refresh token logic if:
+    // 1. Not a 401 error
+    // 2. Already tried refreshing for this request
+    // 3. It's the refresh token endpoint itself
+    // 4. It's a public route (don't trigger refresh for public endpoints)
     if (
       error.response?.status !== 401 ||
       originalRequest._retry ||
-      originalRequest.url === "/auth/refresh"
+      originalRequest.url === "/auth/refresh" ||
+      isPublicRoute(originalRequest.url)
     ) {
       return Promise.reject(error);
     }

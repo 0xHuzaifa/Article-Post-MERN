@@ -6,7 +6,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 
 // Create a new article
 const createArticle = asyncHandler(async (req, res) => {
-  const { title, category, content, slug, isPublished } = req.body;
+  const { title, category, content, isPublished } = req.body;
   const author = req.user?.id; // req.user is set by isLogin middleware
 
   if (!title || !category || !content || !isPublished) {
@@ -126,6 +126,40 @@ const getSpecificArticle = asyncHandler(async (req, res) => {
 });
 
 // Get all published articles, public route
+const getAllArticles = asyncHandler(async (req, res) => {
+  const articles = await Article.aggregate([
+    { $sort: { createdAt: -1 } },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "category",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "author",
+        foreignField: "_id",
+        as: "author",
+      },
+    },
+    {
+      $project: {
+        title: 1,
+        content: 1,
+        slug: 1,
+        isPublished: 1,
+        category: { $arrayElemAt: ["$category.name", 0] },
+        author: { $arrayElemAt: ["$author.username", 0] },
+      },
+    },
+  ]);
+
+  res.json(new ApiResponse(200, "All articles", articles));
+});
+// Get all published articles, public route
 const getPublishedArticles = asyncHandler(async (req, res) => {
   const articles = await Article.aggregate([
     { $match: { isPublished: true } },
@@ -205,4 +239,5 @@ export {
   getSpecificArticle,
   getPublishedArticles,
   getUnpublishedArticles,
+  getAllArticles,
 };

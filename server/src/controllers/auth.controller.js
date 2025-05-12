@@ -2,6 +2,8 @@ import User from "../models/User.model.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import generateTokens from "../utils/generateTokens.js";
+import jwt from "jsonwebtoken";
 
 // cookies option
 const options = {
@@ -37,12 +39,12 @@ const login = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ email });
   if (!user) {
-    throw new ApiError(401, "Invalid Email");
+    throw new ApiError(400, "Invalid Email");
   }
 
   const isMatch = await user.comparePassword(password);
   if (!isMatch) {
-    throw new ApiError(401, "Invalid Password");
+    throw new ApiError(400, "Invalid Password");
   }
 
   const { accessToken, refreshToken } = await generateTokens(user._id);
@@ -77,4 +79,39 @@ const logout = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Logout successful"));
 });
 
-export { register, login, logout };
+const refreshAccessToken = asyncHandler(async (req, res) => {
+  const incomingRefreshToken =
+    req.cookies.refreshToken || req.body.refreshToken;
+
+  if (!incomingRefreshToken) {
+    throw new ApiError(401, "Unauthorized, request");
+  }
+
+  try {
+    const decodedToken = jwt.verify(
+      incomingRefreshToken,
+      process.env.JWT_REFRESH_TOKEN_SECRET_KEY
+    );
+
+    const user = await User.findById(decodedToken.id);
+
+    if (!user) {
+      throw new ApiError(401, "invalid refresh token");
+    }
+
+    if (incomingRefreshToken !== user.refreshToken) {
+      throw new ApiError(401, "Refresh token is expired or used");
+    }
+
+    const accessToken = await user.generateAccessTokens();
+
+    return res
+      .status(200)
+      .cookie("accessToken", accessToken, options)
+      .json(new ApiResponse(200, "Access token refreshed"));
+  } catch (error) {
+    throw new ApiError(401, error.message || "Invalid refresh token");
+  }
+});
+
+export { register, login, logout, refreshAccessToken };

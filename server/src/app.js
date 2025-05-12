@@ -13,12 +13,14 @@ app.use(corsConfig());
 // app.use(cors());
 app.use(cookieParser());
 
-// Error Handler
-app.use(errorHandler);
-
 // Routes
 import authRoutes from "./routes/auth.routes.js";
 import articleRoutes from "./routes/article.routes.js";
+import categoryRoutes from "./routes/category.routes.js";
 
 app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/articles", articleRoutes);
+app.use("/api/v1/article", articleRoutes);
+app.use("/api/v1/category", categoryRoutes);
+
+// Error Handler
+app.use(errorHandler);

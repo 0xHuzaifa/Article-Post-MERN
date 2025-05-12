@@ -4,7 +4,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 // Create a new category
-export const createCategory = asyncHandler(async (req, res) => {
+const createCategory = asyncHandler(async (req, res) => {
   const { name, description } = req.body;
   const author = req.user?.id;
 
@@ -26,7 +26,7 @@ export const createCategory = asyncHandler(async (req, res) => {
 });
 
 // Update a category
-export const updateCategory = asyncHandler(async (req, res) => {
+const updateCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { name, description } = req.body;
   const userId = req.user?.id;
@@ -40,15 +40,23 @@ export const updateCategory = asyncHandler(async (req, res) => {
     throw new ApiError(403, "You are not authorized to update this category");
   }
 
-  if (name) category.name = name;
-  if (description) category.description = description;
-  await category.save();
+  // if (name) category.name = name;
+  // if (description) category.description = description;
+  // await category.save();
+  const updateCategory = await findByIdAndUpdate(
+    { _id: id },
+    {
+      name: name,
+      description: description,
+    },
+    { new: true }
+  );
 
-  res.json(new ApiResponse(200, "Category updated", category));
+  res.json(new ApiResponse(200, "Category updated", updateCategory));
 });
 
 // Delete a category
-export const deleteCategory = asyncHandler(async (req, res) => {
+const deleteCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const userId = req.user?.id;
 
@@ -67,7 +75,7 @@ export const deleteCategory = asyncHandler(async (req, res) => {
 });
 
 // Get a specific category by slug
-export const getSpecificCategory = asyncHandler(async (req, res) => {
+const getSpecificCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const category = await Category.findOne({ _id: id }).populate(
     "author",
@@ -80,7 +88,15 @@ export const getSpecificCategory = asyncHandler(async (req, res) => {
 });
 
 // Get all categories
-export const getAllCategories = asyncHandler(async (req, res) => {
-  const categories = await Category.find().populate("author", "username email");
+const getAllCategories = asyncHandler(async (req, res) => {
+  const categories = await Category.find();
   res.json(new ApiResponse(200, "Categories retrieved", categories));
 });
+
+export {
+  createCategory,
+  updateCategory,
+  deleteCategory,
+  getSpecificCategory,
+  getAllCategories,
+};
