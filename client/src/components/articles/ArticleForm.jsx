@@ -36,7 +36,7 @@ const articleState = {
   isDraft: true,
 };
 
-export default function CreateArticle() {
+export default function ArticleForm() {
   const [article, setArticle] = useState(articleState);
 
   const handleChange = (e) => {

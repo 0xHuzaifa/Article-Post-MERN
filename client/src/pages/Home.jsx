@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import HeroSection from "@/components/HeroSection";
-import { ArticleCard } from "@/components/common/ArticleCard";
+import { ArticleCard } from "@/components/articles/ArticleCard";
 import { Typography } from "@material-tailwind/react";
 
 const AllArticles = [

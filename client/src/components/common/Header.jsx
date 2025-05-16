@@ -10,10 +10,13 @@ import {
   MobileNav,
 } from "@material-tailwind/react";
 import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function Header() {
   const [openNav, setOpenNav] = useState(false);
   const navigate = useNavigate();
+
+  const { isLogin } = useSelector((state) => state.auth);
 
   const navItems = [
     { label: "Home", href: "/" },
@@ -64,26 +67,43 @@ export default function Header() {
         <div className="flex items-center gap-4">
           {/* navbar list */}
           <div className="mr-4 hidden lg:block">{navList}</div>
-          <div className="flex items-center gap-x-1">
-            {/* login button */}
-            <Button
-              variant="text"
-              size="sm"
-              className="hidden lg:inline-block"
-              onClick={() => navigate("/login")}
-            >
-              <span>Log In</span>
-            </Button>
-            {/* signup button */}
-            <Button
-              variant="gradient"
-              size="sm"
-              className="hidden lg:inline-block font-semibold"
-              onClick={() => navigate("/signup")}
-            >
-              <span>Sign in</span>
-            </Button>
-          </div>
+
+          {/* Buttons */}
+          {isLogin ? (
+            <div className="flex items-center gap-x-1">
+              {/* Dashboard button */}
+              <Button
+                variant="gradient"
+                size="sm"
+                className="hidden lg:inline-block"
+                onClick={() => navigate("/dashboard")}
+              >
+                <span>Dashboard</span>
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-x-1">
+              {/* login button */}
+              <Button
+                variant="text"
+                size="sm"
+                className="hidden lg:inline-block"
+                onClick={() => navigate("/login")}
+              >
+                <span>Log In</span>
+              </Button>
+              {/* signup button */}
+              <Button
+                variant="gradient"
+                size="sm"
+                className="hidden lg:inline-block font-semibold"
+                onClick={() => navigate("/signup")}
+              >
+                <span>Sign in</span>
+              </Button>
+            </div>
+          )}
+
           <IconButton
             variant="text"
             className="ml-auto h-6 w-6 text-inherit hover:bg-transparent focus:bg-transparent active:bg-transparent lg:hidden"
@@ -100,24 +120,32 @@ export default function Header() {
       </div>
       <MobileNav open={openNav} className="">
         <div className="px-2">{navList}</div>
-        <div className="flex items-center justify-center gap-x-1 font-semibold px-3 py-0">
-          <Button
-            fullWidth
-            variant="outlined"
-            size="sm"
-            onClick={() => navigate("/login")}
-          >
-            <span>Log In</span>
-          </Button>
-          <Button
-            fullWidth
-            variant="gradient"
-            size="sm"
-            onClick={() => navigate("/signup")}
-          >
-            <span>Sign in</span>
-          </Button>
-        </div>
+        {isLogin ? (
+          <div className="flex items-center justify-center gap-x-1 font-semibold">
+            <Button fullWidth size="sm" onClick={() => navigate("/dashboard")}>
+              <span>Dashboard</span>
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center gap-x-1 font-semibold px-3 py-0">
+            <Button
+              fullWidth
+              variant="outlined"
+              size="sm"
+              onClick={() => navigate("/login")}
+            >
+              <span>Log In</span>
+            </Button>
+            <Button
+              fullWidth
+              variant="gradient"
+              size="sm"
+              onClick={() => navigate("/signup")}
+            >
+              <span>Sign in</span>
+            </Button>
+          </div>
+        )}
       </MobileNav>
     </Navbar>
   );

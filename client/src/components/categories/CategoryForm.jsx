@@ -6,19 +6,22 @@ import {
   Alert,
 } from "@material-tailwind/react";
 import { Link } from "react-router-dom";
-import { login } from "../../redux/slices/authSlice";
+import {
+  createCategory,
+  updateCategory,
+} from "../../redux/slices/categorySlice";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-const loginData = {
-  email: "",
-  password: "",
-};
+function CategoryForm({ category }) {
+  const categoryData = {
+    name: category.name || "",
+    description: category.description || "",
+  };
 
-export function Login() {
-  const [formData, setFormData] = useState(loginData);
-  const { isLoading } = useSelector((state) => state.auth);
+  const [formData, setFormData] = useState(categoryData);
+  const { isLoading } = useSelector((state) => state.category);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -32,7 +35,7 @@ export function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await dispatch(login(formData));
+    const result = await dispatch(createCategory(formData));
     if (result.meta.requestStatus === "fulfilled") {
       navigate("/");
     }
@@ -55,12 +58,12 @@ export function Login() {
             <div className="mb-1 flex flex-col gap-6">
               {/* Email field */}
               <Typography variant="h6" color="blue-gray" className="-mb-3">
-                Your Email
+                Category Name
               </Typography>
               <Input
-                name="email"
+                name="name"
                 size="lg"
-                placeholder="name@mail.com"
+                placeholder="Category"
                 className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
                 onChange={handleInput}
                 value={formData.email}
@@ -71,10 +74,10 @@ export function Login() {
 
               {/* Password field */}
               <Typography variant="h6" color="blue-gray" className="-mb-3">
-                Password
+                Category Description
               </Typography>
               <Input
-                name="password"
+                name="description"
                 type="password"
                 size="lg"
                 placeholder="********"
@@ -92,26 +95,13 @@ export function Login() {
               className="mt-6 disabled:opacity-50 disabled:cursor-none"
               fullWidth
             >
-              log in
+              Submit
             </Button>
-
-            <Typography color="gray" className="mt-4 text-center font-normal">
-              Don't have an account?{" "}
-              <Link to={"/signup"} className="font-medium text-gray-900">
-                Sign Up
-              </Link>
-            </Typography>
-
-            <Typography
-              onClick={() => navigate("/")}
-              color="gray"
-              className="mt-2 text-center font-normal hover:text-blue-gray-900 cursor-pointer"
-            >
-              Visit Home Page
-            </Typography>
           </form>
         </Card>
       </div>
     </div>
   );
 }
+
+export default CategoryForm;

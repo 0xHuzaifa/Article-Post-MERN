@@ -7,11 +7,15 @@ import { Signup } from "@/pages/auth/Signup";
 import Home from "@/pages/Home";
 import ArticleFeed from "@/pages/ArticleFeed";
 import Dashboard from "@/pages/dashboard/Dashboard";
+import MyArticles from "@/pages/dashboard/MyArticles";
+import Category from "@/pages/dashboard/admin/Category";
 
 // components
-import CreateArticle from "@/components/dashboard/user/createArticle";
+import ArticleForm from "@/components/articles/ArticleForm";
 import Layout from "@/components/layout/layout";
-import ArticleDetail from "@/components/common/ArticleDetail";
+import ArticleDetail from "@/components/articles/ArticleDetail";
+import CategoryForm from "./components/categories/CategoryForm";
+
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { getAllArticles } from "@/redux/slices/articleSlice";
@@ -31,24 +35,30 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* Routes with layout */}
+        {/* Routes with layout - public routes */}
         <Route element={<Layout />}>
           <Route index element={<Home />} />
+          <Route path="/articles" element={<ArticleFeed />} /> // All articles
+          <Route path="/articles/:article" element={<ArticleDetail />} /> //
+          Specific article
+        </Route>
+
+        {/* Private routes */}
+        <Route element={<Authentication />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/articles" element={<ArticleFeed />} />
-          <Route path="/articles/:article" element={<ArticleDetail />} />
-          <Route path="/dashboard/create-article" element={<CreateArticle />} />
+
+          {/* Article routes */}
+          <Route path="/dashboard/create-article" element={<ArticleForm />} />
           <Route
             path="/dashboard/update-article/:id"
-            element={<CreateArticle />}
+            element={<ArticleForm />}
           />
-          <Route path="/dashboard/my-articles" element={<CreateArticle />} />
+          <Route path="/dashboard/my-articles" element={<MyArticles />} />
           <Route path="/dashboard/draft-articles" element={<CreateArticle />} />
-          <Route path="/dashboard/categories" element={<CreateArticle />} />
-          <Route
-            path="/dashboard/create-category"
-            element={<CreateArticle />}
-          />
+
+          {/* Category routes */}
+          <Route path="/dashboard/categories" element={<Category />} />
+          <Route path="/dashboard/create-category" element={<CategoryForm />} />
           <Route
             path="/dashboard/update-category/:id"
             element={<CreateArticle />}

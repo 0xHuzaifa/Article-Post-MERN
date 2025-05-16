@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ArticleCard } from "@/components/common/ArticleCard";
+import { ArticleCard } from "@/components/articles/ArticleCard";
 
 const AllArticles = [
   {
