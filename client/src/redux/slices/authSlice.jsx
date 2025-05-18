@@ -15,12 +15,10 @@ const login = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const res = await api.post("/auth/login", data);
-      toast.success(
-        res?.data?.message || res?.message || "Error while getting all articles"
-      );
+      toast.success(res?.data?.message || res?.message || "Login Successful");
       return res.data.data;
     } catch (error) {
-      console.log(error);
+      console.log("login error", error.response);
       toast.error(
         error?.response?.data?.message ||
           error?.response?.message ||
@@ -42,11 +40,11 @@ const register = createAsyncThunk(
       const res = await api.post("/auth/register", data);
       console.log(res);
       toast.success(
-        res?.data?.message || res?.message || "Error while getting all articles"
+        res?.data?.message || res?.message || "Registration Successful"
       );
       return res.data.data;
     } catch (error) {
-      console.log(error);
+      console.log("register error", error.response);
       toast.error(
         error?.response?.data?.message ||
           error?.response?.message ||
@@ -67,8 +65,10 @@ const logout = createAsyncThunk(
     try {
       const res = await api.get("/auth/logout");
       console.log("logout res", res.data);
-      return res.data.data;
+      toast.success(res?.data?.message || res?.message || "Logout Successful");
+      return;
     } catch (error) {
+      console.log("logout error", error.response);
       return rejectWithValue("unexpected error");
     }
   }
@@ -115,6 +115,26 @@ const authSlice = createSlice({
       .addCase(register.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
+      })
+
+      // logout case
+      .addCase(logout.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.user = [];
+        state.isLogin = false;
+        state.isAdmin = false;
+      })
+      .addCase(logout.rejected, (state) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.user = [];
+        state.isLogin = false;
+        state.isAdmin = false;
       });
   },
 });

@@ -32,8 +32,8 @@ const CATEGORIES = [
 const articleState = {
   title: "",
   category: "",
-  description: "",
-  isDraft: true,
+  content: "",
+  isPublish: true,
 };
 
 export default function ArticleForm() {
@@ -71,20 +71,11 @@ export default function ArticleForm() {
 
     console.log("Submitting article:", articleToSubmit);
 
-    // Here you would typically send the data to your backend
-    // For example:
-    // await fetch('/api/articles', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(articleToSubmit),
-    // });
-
-    // Reset form or redirect
     alert(isDraft ? "Article saved as draft" : "Article published!");
   };
 
   return (
-    <div className="w-full p-6 md:p-8 lg:p-10">
+    <div className="w-full p-6 md:p-8 lg:p-10 bg-blue-gray-50">
       <Typography
         color="blue-gray"
         className="mb-4 text-4xl md:text-5xl font-bold"

@@ -18,8 +18,8 @@ router.get("/get-categories", getAllCategories);
 router.use(isAdmin); // middleware
 
 router.post("/create-category", createCategory);
-router.post("/update-category", updateCategory);
-router.post("/delete-category", deleteCategory);
-router.post("/specific-category/:id", getSpecificCategory);
+router.put("/update-category", updateCategory);
+router.delete("/delete-category/:id", deleteCategory);
+router.get("/specific-category/:id", getSpecificCategory);
 
 export default router;

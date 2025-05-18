@@ -7,7 +7,7 @@ import {
   Typography,
   Button,
   IconButton,
-  MobileNav,
+  Collapse,
 } from "@material-tailwind/react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -41,6 +41,7 @@ export default function Header() {
           variant="small"
           color="blue-gray"
           className="p-1 font-bold"
+          onClick={() => setOpenNav(false)}
         >
           <Link
             to={item.href}
@@ -118,7 +119,8 @@ export default function Header() {
           </IconButton>
         </div>
       </div>
-      <MobileNav open={openNav} className="">
+      
+      <Collapse open={openNav} className="px-2">
         <div className="px-2">{navList}</div>
         {isLogin ? (
           <div className="flex items-center justify-center gap-x-1 font-semibold">
@@ -146,7 +148,7 @@ export default function Header() {
             </Button>
           </div>
         )}
-      </MobileNav>
+      </Collapse>
     </Navbar>
   );
 }

@@ -19,16 +19,12 @@ const getAllArticles = createAsyncThunk(
       const res = await api.get("/article/all-articles");
       return res.data.data;
     } catch (error) {
-      toast.error(
+      const message =
         error?.response?.data?.message ||
-          error?.response?.message ||
-          "Error while getting all articles"
-      );
-      return rejectWithValue(
-        error?.response?.data?.message ||
-          error?.response.message ||
-          "Error while getting all articles"
-      );
+        error?.response?.message ||
+        "Error while getting all articles";
+      toast.error(message);
+      return rejectWithValue(message);
     }
   }
 );

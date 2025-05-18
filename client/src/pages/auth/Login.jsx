@@ -7,9 +7,9 @@ import {
 } from "@material-tailwind/react";
 import { Link } from "react-router-dom";
 import { login } from "../../redux/slices/authSlice";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const loginData = {
   email: "",
@@ -18,9 +18,19 @@ const loginData = {
 
 export function Login() {
   const [formData, setFormData] = useState(loginData);
-  const { isLoading } = useSelector((state) => state.auth);
+
+  const { isLoading, isLogin } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = location.state?.from.pathname || "/dashboard";
+
+  useEffect(() => {
+    if (isLogin) {
+      navigate(from, { replace: true });
+    }
+  }, [isLogin, navigate]);
 
   const handleInput = (e) => {
     const { name, value } = e.target;

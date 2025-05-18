@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, Input, Button, Typography } from "@material-tailwind/react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { register } from "../../redux/slices/authSlice";
 
@@ -12,8 +12,18 @@ const signUpData = {
 
 export function Signup() {
   const [formData, setFormData] = useState(signUpData);
-  const { isLoading } = useSelector((state) => state.auth);
+  const { isLoading, isLogin } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = location.state?.from.pathname || "/dashboard";
+
+  useEffect(() => {
+    if (isLogin) {
+      navigate(from, { replace: true });
+    }
+  }, [isLogin, navigate]);
 
   const handleInput = (e) => {
     const { name, value } = e.target;
@@ -23,9 +33,12 @@ export function Signup() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(register(formData));
+    const result = await dispatch(register(formData));
+    if (result.meta.requestStatus === "fulfilled") {
+      navigate("/login");
+    }
   };
 
   return (
