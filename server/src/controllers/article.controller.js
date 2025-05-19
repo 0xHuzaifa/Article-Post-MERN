@@ -108,7 +108,8 @@ const getMyArticles = asyncHandler(async (req, res) => {
   const userId = req.user?.id;
 
   const articles = await Article.find({ author: userId })
-    .populate("category, author")
+    .populate("category", "name")
+    .populate("author", "username")
     .sort({ createdAt: -1 });
 
   res.json(new ApiResponse(200, "My articles", articles));

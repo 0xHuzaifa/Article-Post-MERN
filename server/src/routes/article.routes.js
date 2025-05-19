@@ -22,8 +22,8 @@ route.get("/all-articles", getAllArticles);
 
 route.use(isLogin); // Protect the following routes
 route.post("/create-article", createArticle);
-route.post("/update-article/:id", updateArticle);
-route.post("/delete-article/:id", deleteArticle);
+route.put("/update-article/:id", updateArticle);
+route.delete("/delete-article/:id", deleteArticle);
 route.get("/my-articles", getMyArticles);
 route.get("/unpublished-articles", getUnpublishedArticles);
 

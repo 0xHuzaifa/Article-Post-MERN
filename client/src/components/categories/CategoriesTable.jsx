@@ -91,8 +91,8 @@ export function CategoriesTable() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getAllCategories());
     if (!categories || categories.length === 0) {
+      dispatch(getAllCategories());
     }
   }, [dispatch]);
 

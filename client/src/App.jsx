@@ -20,8 +20,8 @@ import ArticleDetail from "@/components/articles/ArticleDetail";
 import CategoryForm from "@/components/categories/CategoryForm";
 
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { getAllArticles } from "@/redux/slices/articleSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { getPublishArticles } from "@/redux/slices/articleSlice";
 import { ToastContainer } from "react-toastify";
 import {
   PublicRoute,
@@ -29,9 +29,14 @@ import {
   GuestOnlyRoute,
 } from "./auth/RoleProtection";
 function App() {
+
+  const {publishArticles} = useSelector(state => state.article)
+
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(getAllArticles());
+    if (!publishArticles || publishArticles.length === 0) {
+      dispatch(getPublishArticles());
+    }
   }, []);
 
   return (

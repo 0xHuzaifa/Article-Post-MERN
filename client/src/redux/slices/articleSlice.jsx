@@ -29,6 +29,82 @@ const getAllArticles = createAsyncThunk(
   }
 );
 
+const getMyArticles = createAsyncThunk(
+  "/articles/my-articles",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await api.get("/article/my-articles");
+      console.log("my artciles", res);
+      return res.data.data;
+    } catch (error) {
+      console.log("my artciles error", error.response);
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.message ||
+        "Error while getting all articles";
+      toast.error(message);
+      return rejectWithValue(message);
+    }
+  }
+);
+
+const getPublishArticles = createAsyncThunk(
+  "/articles/published-articles",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await api.get("/article/published-articles");
+      console.log("my artciles", res);
+      return res.data.data;
+    } catch (error) {
+      console.log("my artciles error", error.response);
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.message ||
+        "Error while getting all articles";
+      toast.error(message);
+      return rejectWithValue(message);
+    }
+  }
+);
+
+const createArticle = createAsyncThunk(
+  "/articles/create-article",
+  async (formData, { rejectWithValue }) => {
+    try {
+      const res = await api.post("/article/create-article", formData);
+      console.log("create artciles", res);
+      return res.data.data;
+    } catch (error) {
+      console.log("create artciles error", error.response);
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.message ||
+        "Error while getting all articles";
+      toast.error(message);
+      return rejectWithValue(message);
+    }
+  }
+);
+
+const getSpecificArticle = createAsyncThunk(
+  "/articles/specific-article",
+  async (slug, { rejectWithValue }) => {
+    try {
+      const res = await api.get(`/article/specific-article/${slug}`);
+      console.log("get article", res);
+      return res.data.data;
+    } catch (error) {
+      console.log("get article error", error.response);
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.message ||
+        "Error while getting all articles";
+      toast.error(message);
+      return rejectWithValue(message);
+    }
+  }
+);
+
 const articleSlice = createSlice({
   name: "articles",
   initialState,
@@ -61,9 +137,65 @@ const articleSlice = createSlice({
       .addCase(getAllArticles.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
+      })
+
+      // get current users all articles
+      .addCase(getMyArticles.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+      })
+      .addCase(getMyArticles.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        const articles = action.payload || [];
+        state.userArticles = articles.filter(
+          (article) => article.isPublish === true
+        );
+        state.userDraftArticles = articles.filter(
+          (article) => article.isPublish === false
+        );
+      })
+      .addCase(getMyArticles.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+      })
+
+      // get current users all articles
+      .addCase(getPublishArticles.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+      })
+      .addCase(getPublishArticles.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.publishArticles = action.payload || [];
+      })
+      .addCase(getPublishArticles.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+      })
+
+      // get specific articles
+      .addCase(getSpecificArticle.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+      })
+      .addCase(getSpecificArticle.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+      })
+      .addCase(getSpecificArticle.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
       });
   },
 });
 
 export default articleSlice.reducer;
-export { getAllArticles };
+export {
+  getAllArticles,
+  getMyArticles,
+  getPublishArticles,
+  createArticle,
+  getSpecificArticle,
+};

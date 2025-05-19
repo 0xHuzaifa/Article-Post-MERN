@@ -20,8 +20,8 @@ export default function Dashboard() {
   const { categories, isLoading: loadingCategories } = useSelector(
     (state) => state.category
   ); // array
-  console.log("categories", categories);
   const { isAdmin } = useSelector((state) => state.auth);
+  const dispatch = useDispatch()
 
  
 

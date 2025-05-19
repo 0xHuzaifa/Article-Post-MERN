@@ -14,6 +14,7 @@ import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { TRANSFORMERS } from "@lexical/markdown";
 import ToolbarPlugin from "./plugin/Toolbar";
+import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin"
 import "./Editor.css";
 
 function Placeholder() {
@@ -68,6 +69,7 @@ export default function Editor({ onChange }) {
             placeholder={<Placeholder />}
             ErrorBoundary={LexicalErrorBoundary}
           />
+          <OnChangePlugin onChange={onChange} />
           <HistoryPlugin />
           <AutoFocusPlugin />
           <ListPlugin />

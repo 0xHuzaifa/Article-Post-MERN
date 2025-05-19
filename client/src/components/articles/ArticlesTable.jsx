@@ -17,6 +17,8 @@ import {
   Tooltip,
 } from "@material-tailwind/react";
 import { useState } from "react";
+import { Pagination } from "../common/Pagination";
+import { useSelector, useDispatch } from "react-redux";
 
 const TABS = [
   {
@@ -79,8 +81,28 @@ const TABLE_ROWS = [
   },
 ];
 
-export function ArticlesTable() {
-  const [activeTab, setActiveTab] = useState("publish");
+export function ArticlesTable({articles}) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [postPerPage, setPostPerPage] = useState(5);
+  const [open, setOpen] = useState(false);
+  const [modalType, setModalType] = useState(""); // 'edit' or 'delete'
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  const handleOpen = (type, category) => {
+    setModalType(type);
+    setSelectedCategory(category);
+    setOpen(true);
+  };
+
+  const handleClose = () => setOpen(false);
+
+  const dispatch = useDispatch();
+
+  
+
+  const lastPostIndex = currentPage * postPerPage;
+  const firstPostIndex = lastPostIndex - postPerPage;
+  const currentArticles = articles.slice(firstPostIndex, lastPostIndex);
   return (
     <>
       <Card className="h-full w-full my-2">
@@ -105,7 +127,7 @@ export function ArticlesTable() {
               </tr>
             </thead>
             <tbody>
-              {TABLE_ROWS.map(
+              {articles && articles.length > 0 ? (currentArticles.map(
                 ({ img, name, email, job, org, online, date }, index) => {
                   const isLast = index === TABLE_ROWS.length - 1;
                   const classes = isLast
@@ -186,23 +208,28 @@ export function ArticlesTable() {
                     </tr>
                   );
                 }
-              )}
+              )) : (<tr className="h-52">
+                <td colSpan={TABLE_HEAD.length} className="p-6 text-center">
+                  <Typography
+                    variant="h6"
+                    color="blue-gray"
+                    className="font-medium opacity-60"
+                  >
+                    No categories found.
+                  </Typography>
+                </td>
+              </tr>)}
             </tbody>
           </table>
         </CardBody>
-        <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-          <Typography variant="small" color="blue-gray" className="font-normal">
-            Page 1 of 10
-          </Typography>
-          <div className="flex gap-2">
-            <Button variant="outlined" size="sm">
-              Previous
-            </Button>
-            <Button variant="outlined" size="sm">
-              Next
-            </Button>
-          </div>
+        <CardFooter className="flex items-center justify-center border-t border-blue-gray-50 px-4 py-8">
+          <Pagination
+            totalPost={articles?.length}
+            postPerPage={postPerPage}
+            setCurrentPage={setCurrentPage}
+          />
         </CardFooter>
+      
       </Card>
     </>
   );

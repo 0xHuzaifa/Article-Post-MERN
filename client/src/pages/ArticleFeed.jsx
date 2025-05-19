@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { ArticleCard } from "@/components/articles/ArticleCard";
+import { Pagination } from "@/components/common/Pagination";
+import { useDispatch, useSelector } from "react-redux";
+import { getPublishArticles } from "@/redux/slices/articleSlice";
 
 const AllArticles = [
   {
@@ -42,24 +45,48 @@ const AllArticles = [
 
 export default function ArticleFeed() {
   const [articles, setArticles] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [postPerPage, setPostPerPage] = useState(5);
+  const { publishArticles } = useSelector((state) => state.article);
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (!publishArticles || publishArticles.length === 0) {
+      dispatch(getPublishArticles());
+    }
+  }, []);
 
   useEffect(() => {
-    setArticles(AllArticles);
+    setArticles(publishArticles);
   }, []);
+
+  const lastPostIndex = currentPage * postPerPage;
+  const firstPostIndex = lastPostIndex - postPerPage;
+  const currentArticles = articles.slice(firstPostIndex, lastPostIndex);
 
   return (
     <div className="w-full bg-blue-gray-50 min-h-screen pt-24">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 mx-auto justify-items-center">
-        {articles &&
-          articles?.length > 0 &&
+        {articles && articles?.length > 0 ? (
           articles.map((article) => (
             <ArticleCard
               key={article.title}
               title={article.title}
               category={article.category}
-              content={article.description}
+              content={article.content}
+              slug={article.slug}
             />
-          ))}
+          ))
+        ) : (
+          <div>NO articles</div>
+        )}
+      </div>
+      <div className="flex justify-center items-center p-2 mt-5">
+        <Pagination
+          totalPost={articles?.length}
+          postPerPage={postPerPage}
+          setCurrentPage={setCurrentPage}
+        />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardHeader,
@@ -15,63 +15,72 @@ import {
 } from "@material-tailwind/react";
 import { DocumentTextIcon, PencilIcon } from "@heroicons/react/24/solid";
 import Editor from "@/components/lexical/Editor";
-
-const CATEGORIES = [
-  "Technology",
-  "Business",
-  "Health",
-  "Science",
-  "Arts",
-  "Sports",
-  "Travel",
-  "Food",
-  "Education",
-  "Other",
-];
+import { getAllCategories } from "../../redux/slices/categorySlice";
+import { useDispatch, useSelector } from "react-redux";
+import { createArticle } from "../../redux/slices/articleSlice";
+import { $generateHtmlFromNodes } from "@lexical/html";
+import { toast } from "react-toastify";
+import {useNavigate} from "react-router-dom"
 
 const articleState = {
   title: "",
   category: "",
   content: "",
-  isPublish: true,
+  isPublished: false,
 };
 
 export default function ArticleForm() {
-  const [article, setArticle] = useState(articleState);
+  const [formData, setFormData] = useState(articleState);
+  const { categories } = useSelector((state) => state.category); // array
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!categories || categories.length === 0) {
+      dispatch(getAllCategories());
+    }
+  }, [dispatch]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setArticle((prev) => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
-  const handleEditorChange = (editorState) => {
-    // This would typically convert the Lexical editor state to HTML or JSON
-    // For simplicity, we're just setting it directly
-    setArticle((prev) => ({
-      ...prev,
-      content: editorState,
-    }));
+  const handleEditorChange = (editorState, editor) => {
+    editorState.read(() => {
+      const htmlString = $generateHtmlFromNodes(editor);
+      setFormData((prev) => ({
+        ...prev,
+        content: htmlString,
+      }));
+    });
   };
 
   const handleCategoryChange = (value) => {
-    setArticle((prev) => ({
+    setFormData((prev) => ({
       ...prev,
       category: value,
     }));
   };
 
-  const handleSubmit = (isDraft = true) => {
-    const articleToSubmit = {
-      ...article,
-      isDraft,
+  const handleSubmit = async (publish) => {
+    const updatedFormData = {
+      ...formData,
+      isPublished: publish,
     };
-
-    console.log("Submitting article:", articleToSubmit);
-
-    alert(isDraft ? "Article saved as draft" : "Article published!");
+    setFormData(updatedFormData);
+    console.log("Submitting article:", updatedFormData);
+  
+    const result = await dispatch(createArticle(updatedFormData));
+    if(result.meta.requestStatus === 'fulfilled') {
+      toast.success("Article Created Successfully")
+      navigate("/articles")
+    }
+    // alert(isDraft ? "Article saved as draft" : "Article published!");
   };
 
   return (
@@ -93,7 +102,7 @@ export default function ArticleForm() {
                 <Input
                   size="md"
                   name="title"
-                  value={article.title}
+                  value={formData.title}
                   onChange={handleChange}
                   placeholder="Enter article title"
                   className="focus:!border-gray-900 !border-[2px] !border-transparent ring-1 ring-blue-gray-200 placeholder:text-gray-500 placeholder:opacity-100 focus:ring-transparent"
@@ -109,12 +118,12 @@ export default function ArticleForm() {
                 </Typography>
                 <Select
                   label="Select Category"
-                  value={article.category}
+                  value={formData.category}
                   onChange={handleCategoryChange}
                 >
-                  {CATEGORIES.map((category) => (
-                    <Option key={category} value={category}>
-                      {category}
+                  {categories.map((category) => (
+                    <Option key={category.name} value={category.name}>
+                      {category.name}
                     </Option>
                   ))}
                 </Select>
@@ -133,13 +142,13 @@ export default function ArticleForm() {
             <Button
               variant="outlined"
               color="blue-gray"
-              onClick={() => handleSubmit(true)}
+              onClick={() => handleSubmit(false)}
             >
               Save as Draft
             </Button>
             <Button
               color="blue"
-              onClick={() => handleSubmit(false)}
+              onClick={() => handleSubmit(true)}
               className="flex items-center gap-2"
             >
               <PencilIcon className="h-4 w-4" /> Publish

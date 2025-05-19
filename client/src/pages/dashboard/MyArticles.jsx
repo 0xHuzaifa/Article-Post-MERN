@@ -12,13 +12,14 @@ import {
   Tab,
   TabPanel,
 } from "@material-tailwind/react";
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { ArticlesTable } from "@/components/articles/ArticlesTable";
 import { useNavigate } from "react-router-dom";
 import { ScrollText } from "lucide-react";
+import { getMyArticles } from "../../redux/slices/articleSlice"
 
-const data = [
+const tabsData = [
   { label: "Publish", value: "publish" },
   { label: "Draft", value: "draft" },
 ];
@@ -27,8 +28,8 @@ export default function MyArticles() {
   const [activeTab, setActiveTab] = useState("publish");
   const [articlesData, setArticlesData] = useState([]);
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
-  // Selectors for counts
   const {
     userArticles,
     userDraftArticles,
@@ -36,8 +37,13 @@ export default function MyArticles() {
   } = useSelector((state) => state.article); // array
   const { categories, isLoading: loadingCategories } = useSelector(
     (state) => state.category
-  ); // array
-  const { isAdmin } = useSelector((state) => state.auth);
+  ); 
+
+  useEffect(() => {
+    if (!userArticles || userArticles.length === 0) {
+      dispatch(getMyArticles());
+    }
+  }, [dispatch]);
 
   const handleTabChange = () => {
     if(activeTab === "publish") {
@@ -66,14 +72,14 @@ export default function MyArticles() {
         <div>
           <Tabs value={activeTab} className="">
             <TabsHeader className="max-w-80 bg-blue-gray-100 mb-5">
-              {data.map(({ label, value }) => (
+              {tabsData.map(({ label, value }) => (
                 <Tab key={value} value={value} className="font-semibold">
                   {label}
                 </Tab>
               ))}
             </TabsHeader>
             <TabsBody>
-              <ArticlesTable />
+              <ArticlesTable articles={articlesData} />
             </TabsBody>
           </Tabs>
         </div>

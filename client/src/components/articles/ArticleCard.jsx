@@ -8,7 +8,7 @@ import {
 } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
 
-export function ArticleCard({ title, content, category, key }) {
+export function ArticleCard({ title, content, category, key, slug }) {
   const navigate = useNavigate();
   return (
     <Card key={key} className="max-w-96">
@@ -23,10 +23,15 @@ export function ArticleCard({ title, content, category, key }) {
         <Typography variant="h5" color="blue-gray" className="mb-2">
           {title}
         </Typography>
-        <Typography className="!line-clamp-4">{content}</Typography>
+        <div className="prose max-w-none break-words whitespace-pre-wrap overflow-x-auto">
+          <Typography
+            className="!line-clamp-4"
+            dangerouslySetInnerHTML={{ __html: content }}
+          />
+        </div>
       </CardBody>
       <CardFooter className="pt-0">
-        <Button onClick={() => navigate(`/articles/${2}`)}>Read More</Button>
+        <Button onClick={() => navigate(`/articles/${slug}`)}>Read More</Button>
       </CardFooter>
     </Card>
   );

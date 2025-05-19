@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import HeroSection from "@/components/HeroSection";
 import { ArticleCard } from "@/components/articles/ArticleCard";
 import { Typography } from "@material-tailwind/react";
+import { useDispatch, useSelector } from "react-redux";
+import { getPublishArticles } from "@/redux/slices/articleSlice";
 
 const AllArticles = [
   {
@@ -44,9 +46,17 @@ const AllArticles = [
 
 export default function Home() {
   const [articles, setArticles] = useState([]);
+  const { publishArticles } = useSelector((state) => state.article);
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (!publishArticles || publishArticles.length === 0) {
+      dispatch(getPublishArticles());
+    }
+  }, []);
 
   useEffect(() => {
-    const someArticles = AllArticles.slice(0, 3);
+    const someArticles = publishArticles.slice(0, 3);
     setArticles(someArticles);
   }, []);
 
@@ -62,10 +72,10 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 mx-auto justify-items-center">
             {articles.map((article) => (
               <ArticleCard
-                key={article.title}
+                key={article._id}
                 title={article.title}
                 category={article.category}
-                content={article.description}
+                content={article.content}
               />
             ))}
           </div>

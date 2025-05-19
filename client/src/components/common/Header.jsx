@@ -119,17 +119,17 @@ export default function Header() {
           </IconButton>
         </div>
       </div>
-      
+
       <Collapse open={openNav} className="px-2">
         <div className="px-2">{navList}</div>
         {isLogin ? (
-          <div className="flex items-center justify-center gap-x-1 font-semibold">
+          <div className="flex items-center justify-center gap-x-1 font-semibold px-3 pb-5">
             <Button fullWidth size="sm" onClick={() => navigate("/dashboard")}>
               <span>Dashboard</span>
             </Button>
           </div>
         ) : (
-          <div className="flex items-center justify-center gap-x-1 font-semibold px-3 py-0">
+          <div className="flex items-center justify-center gap-x-1 font-semibold px-3 pb-5">
             <Button
               fullWidth
               variant="outlined"
