@@ -1,5 +1,5 @@
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
+import { PencilIcon, TrashIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 import {
   Card,
   CardHeader,
@@ -19,6 +19,9 @@ import {
 import { useState } from "react";
 import { Pagination } from "../common/Pagination";
 import { useSelector, useDispatch } from "react-redux";
+import { ArticleModel } from "./ArticleModel";
+import { View, ViewIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const TABS = [
   {
@@ -81,24 +84,24 @@ const TABLE_ROWS = [
   },
 ];
 
-export function ArticlesTable({articles}) {
+export function ArticlesTable({ articles, isLoading, userArticles = false }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [postPerPage, setPostPerPage] = useState(5);
   const [open, setOpen] = useState(false);
   const [modalType, setModalType] = useState(""); // 'edit' or 'delete'
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedArticle, setSelectedArticle] = useState(null);
 
-  const handleOpen = (type, category) => {
+  const handleOpen = (type, article) => {
+    console.log("aaa");
     setModalType(type);
-    setSelectedCategory(category);
+    setSelectedArticle(article);
     setOpen(true);
   };
 
   const handleClose = () => setOpen(false);
 
   const dispatch = useDispatch();
-
-  
+  const navigate = useNavigate();
 
   const lastPostIndex = currentPage * postPerPage;
   const firstPostIndex = lastPostIndex - postPerPage;
@@ -127,15 +130,41 @@ export function ArticlesTable({articles}) {
               </tr>
             </thead>
             <tbody>
-              {articles && articles.length > 0 ? (currentArticles.map(
-                ({ img, name, email, job, org, online, date }, index) => {
+              {isLoading ? (
+                <>
+                  {[...Array(5)].map((_, idx) => (
+                    <tr key={idx} className="h-16">
+                      <td colSpan={TABLE_HEAD.length} className="p-2">
+                        <div className="flex items-center gap-6">
+                          {/* Title skeleton */}
+                          <div className="w-32 h-4 bg-blue-gray-100 rounded animate-pulse"></div>
+                          {/* Author skeleton */}
+                          <div className="w-20 h-4 bg-blue-gray-100 rounded animate-pulse"></div>
+                          {/* Category skeleton */}
+                          <div className="w-16 h-4 bg-blue-gray-100 rounded animate-pulse"></div>
+                          {/* Status skeleton */}
+                          <div className="w-16 h-4 bg-blue-gray-100 rounded animate-pulse"></div>
+                          {/* Date skeleton */}
+                          <div className="w-20 h-4 bg-blue-gray-100 rounded animate-pulse"></div>
+                          {/* Actions skeleton */}
+                          <div className="flex gap-2">
+                            <div className="w-8 h-8 bg-blue-gray-100 rounded-full animate-pulse"></div>
+                            <div className="w-8 h-8 bg-blue-gray-100 rounded-full animate-pulse"></div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </>
+              ) : articles && articles.length > 0 ? (
+                currentArticles.map((article, index) => {
                   const isLast = index === TABLE_ROWS.length - 1;
                   const classes = isLast
                     ? "p-4"
                     : "p-4 border-b border-blue-gray-50";
 
                   return (
-                    <tr key={name}>
+                    <tr key={article._id}>
                       <td className={classes}>
                         <div className="flex items-center gap-3">
                           <div className="flex flex-col">
@@ -144,14 +173,14 @@ export function ArticlesTable({articles}) {
                               color="blue-gray"
                               className="font-normal"
                             >
-                              {name}
+                              {article.title}
                             </Typography>
                             <Typography
                               variant="small"
                               color="blue-gray"
                               className="font-normal opacity-70"
                             >
-                              {email}
+                              {article.author.username}
                             </Typography>
                           </div>
                         </div>
@@ -163,14 +192,7 @@ export function ArticlesTable({articles}) {
                             color="blue-gray"
                             className="font-normal"
                           >
-                            {job}
-                          </Typography>
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal opacity-70"
-                          >
-                            {org}
+                            {article.category.name}
                           </Typography>
                         </div>
                       </td>
@@ -179,8 +201,8 @@ export function ArticlesTable({articles}) {
                           <Chip
                             variant="ghost"
                             size="sm"
-                            value={online ? "online" : "offline"}
-                            color={online ? "green" : "blue-gray"}
+                            value={article.isPublished ? "Published" : "Draft"}
+                            color={article.isPublished ? "green" : "blue-gray"}
                           />
                         </div>
                       </td>
@@ -190,35 +212,60 @@ export function ArticlesTable({articles}) {
                           color="blue-gray"
                           className="font-normal"
                         >
-                          {date}
+                          {new Date(article.createdAt).toLocaleDateString()}
                         </Typography>
                       </td>
                       <td className={classes}>
-                        <Tooltip content="Edit User">
-                          <IconButton variant="text">
-                            <PencilIcon className="h-4 w-4" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip content="Edit User">
-                          <IconButton variant="text">
-                            <PencilIcon className="h-4 w-4" />
-                          </IconButton>
-                        </Tooltip>
+                        <div className="space-x-2">
+                          {userArticles ? (
+                            <Tooltip content="Edit">
+                              <IconButton
+                                variant="text"
+                                onClick={() => handleOpen("edit", article)}
+                              >
+                                <PencilIcon className="h-4 w-4 text-blue-500" />
+                              </IconButton>
+                            </Tooltip>
+                          ) : (
+                            <Tooltip content="View">
+                              <a
+                                href={`/articles/${slug}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <IconButton variant="text">
+                                  <View className="h-4 w-4 text-black/80" />
+                                </IconButton>
+                              </a>
+                            </Tooltip>
+                          )}
+
+                          <Tooltip content="Delete" className="bg-red-400">
+                            <IconButton
+                              variant="text"
+                              onClick={() => handleOpen("delete", article)}
+                            >
+                              <TrashIcon className="h-4 w-4 text-red-500" />
+                            </IconButton>
+                          </Tooltip>
+                        </div>
                       </td>
                     </tr>
                   );
-                }
-              )) : (<tr className="h-52">
-                <td colSpan={TABLE_HEAD.length} className="p-6 text-center">
-                  <Typography
-                    variant="h6"
-                    color="blue-gray"
-                    className="font-medium opacity-60"
-                  >
-                    No categories found.
-                  </Typography>
-                </td>
-              </tr>)}
+                })
+              ) : (
+                <tr className="h-52">
+                  <td colSpan={TABLE_HEAD.length} className="p-6 text-center">
+                    <Typography
+                      variant="h6"
+                      color="blue-gray"
+                      className="font-medium opacity-60"
+                    >
+                      No articles found.
+                    </Typography>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </CardBody>
@@ -229,8 +276,14 @@ export function ArticlesTable({articles}) {
             setCurrentPage={setCurrentPage}
           />
         </CardFooter>
-      
       </Card>
+
+      <ArticleModel
+        handleOpen={handleClose}
+        open={open}
+        type={modalType}
+        article={selectedArticle}
+      />
     </>
   );
 }

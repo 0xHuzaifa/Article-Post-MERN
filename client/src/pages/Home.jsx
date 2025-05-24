@@ -53,12 +53,12 @@ export default function Home() {
     if (!publishArticles || publishArticles.length === 0) {
       dispatch(getPublishArticles());
     }
-  }, []);
+  }, [dispatch, publishArticles]);
 
   useEffect(() => {
     const someArticles = publishArticles.slice(0, 3);
     setArticles(someArticles);
-  }, []);
+  }, [publishArticles]);
 
   return (
     <div className="h-[1000px]">
@@ -68,13 +68,13 @@ export default function Home() {
           Latest Articles
         </Typography>
         <hr className="max-w-full mt-2 bg-blue-gray-900 rounded-lg" />
-        {articles && articles.length > 0 && (
+        {publishArticles && publishArticles.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 mx-auto justify-items-center">
             {articles.map((article) => (
               <ArticleCard
                 key={article._id}
                 title={article.title}
-                category={article.category}
+                category={article.category.name}
                 content={article.content}
               />
             ))}

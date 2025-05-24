@@ -53,7 +53,7 @@ const getPublishArticles = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await api.get("/article/published-articles");
-      console.log("my artciles", res);
+      console.log("publish articles", res);
       return res.data.data;
     } catch (error) {
       console.log("my artciles error", error.response);
@@ -118,6 +118,10 @@ const articleSlice = createSlice({
         (article) => article.isPublished === false
       );
     },
+    clearUserArticles: (state) => {
+      state.userArticles = [];
+      state.userDraftArticles = [];
+    },
   },
 
   extraReducers: (builder) => {
@@ -127,12 +131,12 @@ const articleSlice = createSlice({
         state.isError = false;
       })
       .addCase(getAllArticles.fulfilled, (state, action) => {
-        state.isLoading = false;
         state.isError = false;
         state.articles = action.payload;
         state.publishArticles = state.articles.filter(
           (article) => article.isPublished === true
         );
+        state.isLoading = false;
       })
       .addCase(getAllArticles.rejected, (state, action) => {
         state.isLoading = false;
@@ -145,15 +149,15 @@ const articleSlice = createSlice({
         state.isError = false;
       })
       .addCase(getMyArticles.fulfilled, (state, action) => {
-        state.isLoading = false;
         state.isError = false;
         const articles = action.payload || [];
         state.userArticles = articles.filter(
-          (article) => article.isPublish === true
+          (article) => article.isPublished === true
         );
         state.userDraftArticles = articles.filter(
-          (article) => article.isPublish === false
+          (article) => article.isPublished === false
         );
+        state.isLoading = false;
       })
       .addCase(getMyArticles.rejected, (state, action) => {
         state.isLoading = false;
@@ -166,11 +170,32 @@ const articleSlice = createSlice({
         state.isError = false;
       })
       .addCase(getPublishArticles.fulfilled, (state, action) => {
-        state.isLoading = false;
         state.isError = false;
         state.publishArticles = action.payload || [];
+        state.isLoading = false;
       })
       .addCase(getPublishArticles.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+      })
+
+      // create articles
+      .addCase(createArticle.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+      })
+      .addCase(createArticle.fulfilled, (state, action) => {
+        state.isError = false;
+        const isPublish = action.payload.isPublished;
+        if (isPublish) {
+          state.publishArticles.unshift(action.payload);
+          state.userArticles.unshift(action.payload);
+        } else {
+          state.userDraftArticles.unshift(action.payload);
+        }
+        state.isLoading = false;
+      })
+      .addCase(createArticle.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
       })
@@ -192,6 +217,7 @@ const articleSlice = createSlice({
 });
 
 export default articleSlice.reducer;
+export const { clearUserArticles } = articleSlice.actions;
 export {
   getAllArticles,
   getMyArticles,

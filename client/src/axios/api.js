@@ -11,6 +11,8 @@ const api = axios.create({
 const publicRoutes = [
   "/auth/login",
   "/auth/register",
+  "/auth/refresh",
+  "/articles/published-articles"
   // Add other public endpoints as needed
 ];
 
@@ -38,23 +40,19 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Skip refresh token logic if:
-    // 1. Not a 401 error
-    // 2. Already tried refreshing for this request
-    // 3. It's the refresh token endpoint itself
-    // 4. It's a public route (don't trigger refresh for public endpoints)
+    // Only proceed if it's a 401 error and not a public route
     if (
       error.response?.status !== 401 ||
       originalRequest._retry ||
-      originalRequest.url === "/auth/refresh" ||
       isPublicRoute(originalRequest.url)
     ) {
       return Promise.reject(error);
     }
 
+    // Mark this request as retried
     originalRequest._retry = true;
 
-    //
+    // If already refreshing, queue this request
     if (isRefreshing) {
       return new Promise((resolve, reject) => {
         failedQueue.push({ resolve, reject });
@@ -63,25 +61,31 @@ api.interceptors.response.use(
           return api(originalRequest);
         })
         .catch((error) => {
-          Promise.reject(error);
+          return Promise.reject(error);
         });
     }
 
     isRefreshing = true;
 
     try {
+      // Attempt to refresh the token
       await api.get("/auth/refresh");
 
       processQueue(null);
 
       return api(originalRequest);
     } catch (refreshError) {
+      // If refresh fails, clear all pending requests
       processQueue(refreshError);
 
       // Clear auth state (e.g., Redux, Context)
       // Example: store.dispatch({ type: 'LOGOUT' });
-
-      window.location.href = "/login"; // Redirect to login page
+      // store.dispatch(clearAuthState());
+      import("../redux/store").then(({ store }) => {
+        import("../redux/slices/authSlice").then(({ clearAuthState }) => {
+          store.dispatch(clearAuthState());
+        });
+      });
       return Promise.reject(refreshError);
     } finally {
       // Always reset isRefreshing to prevent deadlocks

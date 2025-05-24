@@ -15,17 +15,10 @@ const authPersistConfig = {
   whitelist: ["isLogin", "isAdmin", "user"],
 };
 
-const articlePersistConfig = {
-  key: "article",
-  storage,
-  whitelist: [
-    "articles",
-    "publishArticles",
-    "draftArticles",
-    "userArticles",
-    "userDraftArticles",
-  ],
-};
+// const articlePersistConfig = {
+//   key: "article",
+//   storage,
+// };
 
 const categoryPersistConfig = {
   key: "category",
@@ -36,13 +29,13 @@ const categoryPersistConfig = {
 const formPersistConfig = {
   key: "form",
   storage,
-  whitelist: ["mode", "electedFormData"],
+  whitelist: ["mode", "selectedFormData"],
 };
 
 // filepath: src/redux/store.js
 const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
-  article: persistReducer(articlePersistConfig, articleReducer),
+  article: articleReducer,
   category: persistReducer(categoryPersistConfig, categoryReducer),
   form: persistReducer(formPersistConfig, formReducer),
 });

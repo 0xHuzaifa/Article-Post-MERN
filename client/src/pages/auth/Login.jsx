@@ -44,7 +44,7 @@ export function Login() {
     e.preventDefault();
     const result = await dispatch(login(formData));
     if (result.meta.requestStatus === "fulfilled") {
-      navigate("/");
+      navigate("/dashboard");
     }
   };
 
@@ -98,6 +98,7 @@ export function Login() {
             </div>
             <Button
               disabled={isLoading}
+              loading={isLoading}
               type="submit"
               className="mt-6 disabled:opacity-50 disabled:cursor-none"
               fullWidth

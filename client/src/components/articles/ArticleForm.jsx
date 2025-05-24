@@ -21,6 +21,7 @@ import { createArticle } from "../../redux/slices/articleSlice";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { toast } from "react-toastify";
 import {useNavigate} from "react-router-dom"
+import { getPublishArticles } from "../../redux/slices/articleSlice";
 
 const articleState = {
   title: "",
@@ -78,9 +79,13 @@ export default function ArticleForm() {
     const result = await dispatch(createArticle(updatedFormData));
     if(result.meta.requestStatus === 'fulfilled') {
       toast.success("Article Created Successfully")
-      navigate("/articles")
+      if (publish) { 
+        // dispatch(getPublishArticles());
+        navigate("/articles")
+      } else {
+        navigate("/dashboard/my-articles")
+      }
     }
-    // alert(isDraft ? "Article saved as draft" : "Article published!");
   };
 
   return (

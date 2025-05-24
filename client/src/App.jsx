@@ -9,7 +9,7 @@ import ArticleFeed from "@/pages/ArticleFeed";
 import Dashboard from "@/pages/dashboard/Dashboard";
 import MyArticles from "@/pages/dashboard/MyArticles";
 import Category from "@/pages/dashboard/admin/Category";
-// import DraftArticles from "@/pages/dashboard/DraftArticles";
+import Articles from "./pages/dashboard/admin/Articles";
 import NotFound from "./pages/NotFound";
 
 // components
@@ -28,16 +28,37 @@ import {
   PrivateRoute,
   GuestOnlyRoute,
 } from "./auth/RoleProtection";
-function App() {
+import { authMe } from "./redux/slices/authSlice";
+import LoadingScreen from "@/components/common/LoadingScreen";
 
-  const {publishArticles} = useSelector(state => state.article)
+function App() {
+  const { publishArticles } = useSelector((state) => state.article);
+  const { authMeLoading } = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();
   useEffect(() => {
     if (!publishArticles || publishArticles.length === 0) {
       dispatch(getPublishArticles());
     }
-  }, []);
+  }, [publishArticles, dispatch]);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        await dispatch(authMe()).unwrap();
+        console.log("Auth check complete - authenticated");
+      } catch (error) {
+        // Error is handled in the Redux slice, we don't need to do anything here
+        console.log("Auth check complete - not authenticated", error);
+        console.log("error", error);
+      }
+    };
+    checkAuth();
+  }, [dispatch]);
+
+  if (authMeLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div>
@@ -76,9 +97,9 @@ function App() {
 
           {/* Private Routes only for Admin */}
           <Route element={<PrivateRoute allowedRole="admin" />}>
-          {/* All Publish Articles */}
-            <Route path="/all-articles" element={<ArticleFeed />} />
-            
+            {/* All Publish Articles */}
+            <Route path="/all-articles" element={<Articles />} />
+
             {/* Category routes */}
             <Route path="/dashboard/categories" element={<Category />} />
             <Route

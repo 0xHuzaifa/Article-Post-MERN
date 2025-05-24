@@ -8,10 +8,10 @@ import {
 } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
 
-export function ArticleCard({ title, content, category, key, slug }) {
+export function ArticleCard({ title, content, category, slug }) {
   const navigate = useNavigate();
   return (
-    <Card key={key} className="max-w-96">
+    <Card className="max-w-96">
       <CardBody>
         <Chip
           size="sm"

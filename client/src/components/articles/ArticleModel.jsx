@@ -14,7 +14,7 @@ import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 
 export function ArticleModel({ handleOpen, open, type, article }) {
-  if (!category) return null;
+  if (!article) return null;
 
   const isEdit = type === "edit";
   const title = isEdit ? "Edit Article" : "Delete Article";
@@ -27,9 +27,9 @@ export function ArticleModel({ handleOpen, open, type, article }) {
   const handleSubmit = async () => {
     if (type === "edit") {
       dispatch(setFormMode("update"));
-      dispatch(setSelectedFormData(category));
+      dispatch(setSelectedFormData(article));
     } else if (type === "delete") {
-      const result = await dispatch(deleteCategory(category._id));
+      const result = await dispatch(deleteCategory(article._id));
       if (result.meta.requestStatus === "fulfilled") {
         toast.success("Article Deleted Successfully");
       }
@@ -41,7 +41,7 @@ export function ArticleModel({ handleOpen, open, type, article }) {
     <Dialog open={open} handler={handleOpen}>
       <DialogHeader>{title}</DialogHeader>
       <DialogBody>
-        <Typography variant="h5">{category.name}</Typography>
+        <Typography variant="h5">{article.title}</Typography>
         <div className="mt-2">{desc}</div>
       </DialogBody>
       <DialogFooter>

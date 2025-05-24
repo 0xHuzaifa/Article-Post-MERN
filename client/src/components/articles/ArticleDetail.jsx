@@ -9,7 +9,7 @@ import {
 } from "@material-tailwind/react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getSpecificArticle } from "../../redux/slices/articleSlice";
 import { Spinner } from "@material-tailwind/react";
 
@@ -17,7 +17,7 @@ export default function ArticleDetailPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const param = useParams();
-  const slug = param.article
+  const slug = param.article;
 
   const { isLoading } = useSelector((state) => state.article);
 
@@ -36,6 +36,21 @@ export default function ArticleDetailPage() {
     fetchData();
   }, [slug, dispatch]);
 
+  function calculateReadTime(htmlContent) {
+    // Remove HTML tags and decode entities
+    const text = htmlContent
+      ? new DOMParser().parseFromString(htmlContent, "text/html").body
+          .textContent || ""
+      : "";
+    const words = text.trim().split(/\s+/).length;
+    const wordsPerMinute = 200;
+    const minutes = Math.ceil(words / wordsPerMinute);
+    return minutes;
+  }
+
+  // Inside your component, after fetching article
+  const readTime = article?.content ? calculateReadTime(article.content) : 0;
+
   if (isLoading) {
     return (
       <div className="w-full h-screen bg-blue-gray-50 flex justify-center items-center">
@@ -45,14 +60,14 @@ export default function ArticleDetailPage() {
   }
 
   return (
-    <div className="max-w-full px-4 pt-24 pb-8 bg-blue-gray-50">
+    <div className="max-w-full min-h-screen px-4 pt-24 pb-8 bg-blue-gray-50">
       {/* Breadcrumbs navigation */}
-      <Breadcrumbs className="mb-6 bg-white rounded">
+      <Breadcrumbs className="my-6 bg-white rounded">
         <a href="#" className="opacity-60">
           Home
         </a>
         <a href="#" className="opacity-60">
-          Blog
+          Article
         </a>
         <a href="#">{article?.category?.name}</a>
       </Breadcrumbs>
@@ -78,7 +93,7 @@ export default function ArticleDetailPage() {
                 {new Date(article?.createdAt).toLocaleDateString()}
               </Typography>
               <span>•</span>
-              {/* <Typography variant="small">{article.readTime}</Typography> */}
+              <Typography variant="small">{readTime}m read time</Typography>
             </div>
           </div>
 

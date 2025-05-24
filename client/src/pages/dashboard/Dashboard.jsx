@@ -8,6 +8,10 @@ import {
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllCategories } from "../../redux/slices/categorySlice";
+import {
+  getMyArticles,
+  getPublishArticles,
+} from "../../redux/slices/articleSlice";
 
 export default function Dashboard() {
   // Selectors for counts
@@ -21,9 +25,7 @@ export default function Dashboard() {
     (state) => state.category
   ); // array
   const { isAdmin } = useSelector((state) => state.auth);
-  const dispatch = useDispatch()
-
- 
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!categories || categories.length === 0) {
@@ -31,19 +33,21 @@ export default function Dashboard() {
     }
 
     if (!publishArticles || publishArticles.length === 0) {
-      
+      dispatch(getPublishArticles());
     }
+
     if (!userArticles || userArticles.length === 0) {
-
+      dispatch(getMyArticles());
     }
+
     if (!userDraftArticles || userDraftArticles.length === 0) {
-
+      dispatch(getMyArticles());
     }
-  }, []);
+  }, [dispatch, categories, publishArticles]);
 
   return (
     <div className="w-full bg-blue-gray-50 min-h-screen">
-      <div className="container mx-auto px-4 md:px-8 py-3 md:py-7">
+      <div className="mx-auto px-4 md:px-8 py-3 md:py-7">
         <Typography variant="h1" className="mb-8">
           Dashboard
         </Typography>
@@ -57,7 +61,7 @@ export default function Dashboard() {
         >
           {isAdmin &&
             (loadingArticles ? (
-              <div className="max-w-full animate-pulse">
+              <div className="mt-6 max-w-full animate-pulse">
                 <Typography
                   as="div"
                   variant="h1"
@@ -81,7 +85,7 @@ export default function Dashboard() {
                 </Typography>
               </div>
             ) : (
-              <Card className="mt-6">
+              <Card className="mt-6 text-nowrap">
                 <CardBody>
                   <Typography variant="h5" color="blue-gray" className="mb-2">
                     Published Articles
@@ -94,7 +98,7 @@ export default function Dashboard() {
             ))}
 
           {loadingArticles ? (
-            <div className="max-w-full animate-pulse">
+            <div className="mt-6 max-w-full animate-pulse">
               <Typography
                 as="div"
                 variant="h1"
@@ -119,7 +123,7 @@ export default function Dashboard() {
               </Typography>
             </div>
           ) : (
-            <Card className="mt-6">
+            <Card className="mt-6 text-nowrap">
               <CardBody>
                 <Typography variant="h5" color="blue-gray" className="mb-2">
                   My Articles
@@ -132,7 +136,7 @@ export default function Dashboard() {
           )}
 
           {loadingArticles ? (
-            <div className="max-w-full animate-pulse">
+            <div className="mt-6 max-w-full animate-pulse">
               <Typography
                 as="div"
                 variant="h1"
@@ -157,7 +161,7 @@ export default function Dashboard() {
               </Typography>
             </div>
           ) : (
-            <Card className="mt-6">
+            <Card className="mt-6 text-nowrap">
               <CardBody>
                 <Typography variant="h5" color="blue-gray" className="mb-2">
                   My Draft Articles
@@ -172,7 +176,7 @@ export default function Dashboard() {
           {/* Categories */}
           {isAdmin &&
             (loadingCategories ? (
-              <div className="max-w-full animate-pulse">
+              <div className="mt-6 max-w-full animate-pulse">
                 <Typography
                   as="div"
                   variant="h1"
@@ -197,7 +201,7 @@ export default function Dashboard() {
                 </Typography>
               </div>
             ) : (
-              <Card className="mt-6">
+              <Card className="mt-6 text-nowrap">
                 <CardBody>
                   <Typography variant="h5" color="blue-gray" className="mb-2">
                     Categories

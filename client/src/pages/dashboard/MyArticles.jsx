@@ -17,7 +17,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { ArticlesTable } from "@/components/articles/ArticlesTable";
 import { useNavigate } from "react-router-dom";
 import { ScrollText } from "lucide-react";
-import { getMyArticles } from "../../redux/slices/articleSlice"
+import { getMyArticles } from "../../redux/slices/articleSlice";
 
 const tabsData = [
   { label: "Publish", value: "publish" },
@@ -28,30 +28,30 @@ export default function MyArticles() {
   const [activeTab, setActiveTab] = useState("publish");
   const [articlesData, setArticlesData] = useState([]);
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const {
-    userArticles,
-    userDraftArticles,
-    isLoading: loadingArticles,
-  } = useSelector((state) => state.article); // array
-  const { categories, isLoading: loadingCategories } = useSelector(
-    (state) => state.category
-  ); 
+  const { userArticles, userDraftArticles, isLoading } = useSelector(
+    (state) => state.article
+  ); // array
 
   useEffect(() => {
     if (!userArticles || userArticles.length === 0) {
       dispatch(getMyArticles());
     }
-  }, [dispatch]);
+  }, []);
 
-  const handleTabChange = () => {
-    if(activeTab === "publish") {
-      setArticlesData(userArticles)
-    } else if (activeTab === 'draft') {
-      setArticlesData(userDraftArticles)
+  useEffect(() => {
+    if (activeTab === "publish") {
+      setArticlesData(userArticles);
+    } else if (activeTab === "draft") {
+      setArticlesData(userDraftArticles);
     }
-  }
+  }, [activeTab, userArticles, userDraftArticles]);
+
+  // Replace your handleTabChange with:
+  const handleTabChange = (value) => {
+    setActiveTab(value);
+  };
 
   return (
     <div className="w-full bg-blue-gray-50 min-h-screen">
@@ -73,13 +73,22 @@ export default function MyArticles() {
           <Tabs value={activeTab} className="">
             <TabsHeader className="max-w-80 bg-blue-gray-100 mb-5">
               {tabsData.map(({ label, value }) => (
-                <Tab key={value} value={value} className="font-semibold">
+                <Tab
+                  key={value}
+                  value={value}
+                  className="font-semibold"
+                  onClick={() => handleTabChange(value)}
+                >
                   {label}
                 </Tab>
               ))}
             </TabsHeader>
             <TabsBody>
-              <ArticlesTable articles={articlesData} />
+              <ArticlesTable
+                articles={articlesData}
+                isLoading={isLoading}
+                userArticles={true}
+              />
             </TabsBody>
           </Tabs>
         </div>

@@ -9,6 +9,7 @@ import jwt from "jsonwebtoken";
 const options = {
   httpOnly: true,
   secure: true,
+  sameSite: "strict"
 };
 
 // Register
@@ -52,10 +53,14 @@ const login = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
+    .cookie("refreshToken", refreshToken, {
+      ...options,
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    })
     .json(
       new ApiResponse(200, "login successful", {
         id: user._id,
+        email: user.email,
         user: user.username,
         role: user.role,
       })
@@ -80,38 +85,61 @@ const logout = asyncHandler(async (req, res) => {
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
-  const incomingRefreshToken =
-    req.cookies.refreshToken || req.body.refreshToken;
-
-  if (!incomingRefreshToken) {
-    throw new ApiError(401, "Unauthorized, request");
-  }
-
   try {
+    // Check if refreshToken exists in cookies or body with proper null handling
+    const incomingRefreshToken = 
+      req.cookies?.refreshToken || req.body?.refreshToken;
+
+    // Handle missing token scenario
+    if (!incomingRefreshToken) {
+      throw new ApiError(401, "Unauthorized: No refresh token provided");
+    }
+
+    // Verify the token
     const decodedToken = jwt.verify(
       incomingRefreshToken,
       process.env.JWT_REFRESH_TOKEN_SECRET_KEY
     );
 
-    const user = await User.findById(decodedToken.id);
-
+    // Find user with error handling
+    const user = await User.findById(decodedToken?.id);
     if (!user) {
-      throw new ApiError(401, "invalid refresh token");
+      throw new ApiError(401, "Invalid refresh token");
     }
 
+    // Validate token matches what's stored
     if (incomingRefreshToken !== user.refreshToken) {
       throw new ApiError(401, "Refresh token is expired or used");
     }
 
+    // Generate new access token
     const accessToken = await user.generateAccessTokens();
 
+    // Return new token
     return res
       .status(200)
       .cookie("accessToken", accessToken, options)
       .json(new ApiResponse(200, "Access token refreshed"));
   } catch (error) {
-    throw new ApiError(401, error.message || "Invalid refresh token");
+    // Handle JWT verification errors specifically
+    if (error.name === "JsonWebTokenError" || error.name === "TokenExpiredError") {
+      throw new ApiError(401, "Invalid or expired token");
+    }
+    // Re-throw the error to be handled by asyncHandler and errorHandler
+    throw error;
   }
 });
 
-export { register, login, logout, refreshAccessToken };
+const authMe = asyncHandler(async (req, res) => {
+  const {id} = req.user;
+  const user =  await User.findById(id);
+  if (!user) {
+    throw new ApiError(401, "User not found")
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "authenticate successful", {id: user._id, username: user.username, email: user.email, role: user.role}));
+});
+
+export { register, login, logout, refreshAccessToken, authMe };
