@@ -7,14 +7,15 @@ import {
   DialogFooter,
   Typography,
 } from "@material-tailwind/react";
-
-import { deleteCategory } from "../../redux/slices/categorySlice";
+import { deleteArticle } from "../../redux/slices/articleSlice";
 import { setFormMode, setSelectedFormData } from "../../redux/slices/formSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 export function ArticleModel({ handleOpen, open, type, article }) {
   if (!article) return null;
+  const { isLoading } = useSelector((state) => state.article);
 
   const isEdit = type === "edit";
   const title = isEdit ? "Edit Article" : "Delete Article";
@@ -23,13 +24,15 @@ export function ArticleModel({ handleOpen, open, type, article }) {
     : `Are you sure you want to delete this article? This action cannot be undone.`;
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleSubmit = async () => {
     if (type === "edit") {
-      dispatch(setFormMode("update"));
+      dispatch(setFormMode("edit"));
       dispatch(setSelectedFormData(article));
+      navigate(`/dashboard/update-article/${article._id}`);
     } else if (type === "delete") {
-      const result = await dispatch(deleteCategory(article._id));
+      const result = await dispatch(deleteArticle(article._id));
       if (result.meta.requestStatus === "fulfilled") {
         toast.success("Article Deleted Successfully");
       }
@@ -54,11 +57,25 @@ export function ArticleModel({ handleOpen, open, type, article }) {
           <span>Cancel</span>
         </Button>
         {isEdit ? (
-          <Button onClick={handleSubmit} variant="gradient" color="blue">
+          <Button
+            onClick={handleSubmit}
+            variant="gradient"
+            color="blue"
+            loading={isLoading}
+            disabled={isLoading}
+            className="disabled:opacity-50"
+          >
             <span>Update</span>
           </Button>
         ) : (
-          <Button onClick={handleSubmit} variant="gradient" color="red">
+          <Button
+            onClick={handleSubmit}
+            variant="gradient"
+            color="red"
+            loading={isLoading}
+            disabled={isLoading}
+            className="disabled:opacity-50"
+          >
             <span>Delete</span>
           </Button>
         )}

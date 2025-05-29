@@ -73,13 +73,14 @@ const createArticle = createAsyncThunk(
     try {
       const res = await api.post("/article/create-article", formData);
       console.log("create artciles", res);
+      toast.success("Article Created Successfully")
       return res.data.data;
     } catch (error) {
-      console.log("create artciles error", error.response);
+      console.log("create articles error", error);
       const message =
         error?.response?.data?.message ||
         error?.response?.message ||
-        "Error while getting all articles";
+        "Error while creating articles";
       toast.error(message);
       return rejectWithValue(message);
     }
@@ -99,6 +100,45 @@ const getSpecificArticle = createAsyncThunk(
         error?.response?.data?.message ||
         error?.response?.message ||
         "Error while getting all articles";
+      toast.error(message);
+      return rejectWithValue(message);
+    }
+  }
+);
+
+const updateArticle = createAsyncThunk(
+  "/articles//update-article/:id",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await api.put(`/article/update-article/${data.id}`, data);
+      console.log("update article", res);
+      toast.success("Article Updated Successfully")
+      return res.data.data;
+    } catch (error) {
+      console.log("update article error", error);
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.message ||
+        "Error while updating article";
+      toast.error(message);
+      return rejectWithValue(message);
+    }
+  }
+);
+
+const deleteArticle = createAsyncThunk(
+  "/articles//delete-article/:id",
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await api.delete(`/article/delete-article/${id}`);
+      console.log("delete article", res);
+      return id;
+    } catch (error) {
+      console.log("delete article error", error.response);
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.message ||
+        "Error while deleting article";
       toast.error(message);
       return rejectWithValue(message);
     }
@@ -138,7 +178,7 @@ const articleSlice = createSlice({
         );
         state.isLoading = false;
       })
-      .addCase(getAllArticles.rejected, (state, action) => {
+      .addCase(getAllArticles.rejected, (state) => {
         state.isLoading = false;
         state.isError = true;
       })
@@ -159,7 +199,7 @@ const articleSlice = createSlice({
         );
         state.isLoading = false;
       })
-      .addCase(getMyArticles.rejected, (state, action) => {
+      .addCase(getMyArticles.rejected, (state) => {
         state.isLoading = false;
         state.isError = true;
       })
@@ -174,7 +214,7 @@ const articleSlice = createSlice({
         state.publishArticles = action.payload || [];
         state.isLoading = false;
       })
-      .addCase(getPublishArticles.rejected, (state, action) => {
+      .addCase(getPublishArticles.rejected, (state) => {
         state.isLoading = false;
         state.isError = true;
       })
@@ -195,7 +235,7 @@ const articleSlice = createSlice({
         }
         state.isLoading = false;
       })
-      .addCase(createArticle.rejected, (state, action) => {
+      .addCase(createArticle.rejected, (state) => {
         state.isLoading = false;
         state.isError = true;
       })
@@ -205,11 +245,59 @@ const articleSlice = createSlice({
         state.isLoading = true;
         state.isError = false;
       })
-      .addCase(getSpecificArticle.fulfilled, (state, action) => {
+      .addCase(getSpecificArticle.fulfilled, (state) => {
         state.isLoading = false;
         state.isError = false;
       })
-      .addCase(getSpecificArticle.rejected, (state, action) => {
+      .addCase(getSpecificArticle.rejected, (state) => {
+        state.isLoading = false;
+        state.isError = true;
+      })
+
+      // update specific articles
+      .addCase(updateArticle.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+      })
+      .addCase(updateArticle.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        const updateArticle = action.payload;
+        state.publishArticles = state.publishArticles.filter((article) =>
+          article._id === updateArticle._id ? updateArticle : article
+        );
+        state.userArticles = state.userArticles.filter((article) =>
+          article._id === updateArticle._id ? updateArticle : article
+        );
+        state.userDraftArticles = state.userArticles.filter((article) =>
+          article._id === updateArticle._id ? updateArticle : article
+        );
+      })
+      .addCase(updateArticle.rejected, (state) => {
+        state.isLoading = false;
+        state.isError = true;
+      })
+
+      // delete specific articles
+      .addCase(deleteArticle.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+      })
+      .addCase(deleteArticle.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        const deleteArticle = action.payload;
+        state.publishArticles = state.publishArticles.filter(
+          (article) => article._id !== deleteArticle
+        );
+        state.userArticles = state.userArticles.filter(
+          (article) => article._id !== deleteArticle
+        );
+        state.userDraftArticles = state.userArticles.filter(
+          (article) => article._id !== deleteArticle
+        );
+      })
+      .addCase(deleteArticle.rejected, (state) => {
         state.isLoading = false;
         state.isError = true;
       });
@@ -224,4 +312,6 @@ export {
   getPublishArticles,
   createArticle,
   getSpecificArticle,
+  updateArticle,
+  deleteArticle,
 };

@@ -147,18 +147,18 @@ const authSlice = createSlice({
 
       // logout case
       .addCase(logout.pending, (state) => {
-        state.isLoading = true;
+        state.authMeLoading = true;
         state.isError = false;
       })
       .addCase(logout.fulfilled, (state) => {
-        state.isLoading = false;
+        state.authMeLoading = false;
         state.isError = false;
         state.user = [];
         state.isLogin = false;
         state.isAdmin = false;
       })
       .addCase(logout.rejected, (state) => {
-        state.isLoading = false;
+        state.authMeLoading = false;
         state.isError = false;
         state.user = [];
         state.isLogin = false;

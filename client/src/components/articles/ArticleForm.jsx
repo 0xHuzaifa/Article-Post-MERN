@@ -14,16 +14,14 @@ import {
   Option,
 } from "@material-tailwind/react";
 import { DocumentTextIcon, PencilIcon } from "@heroicons/react/24/solid";
-import Editor from "@/components/lexical/Editor";
+import { Editor } from "@/components/lexical/Editor";
 import { getAllCategories } from "../../redux/slices/categorySlice";
 import { useDispatch, useSelector } from "react-redux";
-import { createArticle } from "../../redux/slices/articleSlice";
+import { createArticle, updateArticle } from "../../redux/slices/articleSlice";
 import { $generateHtmlFromNodes } from "@lexical/html";
-import { toast } from "react-toastify";
-import {useNavigate} from "react-router-dom"
-import { getPublishArticles } from "../../redux/slices/articleSlice";
+import { useNavigate } from "react-router-dom";
 
-const articleState = {
+const initialForm = {
   title: "",
   category: "",
   content: "",
@@ -31,11 +29,14 @@ const articleState = {
 };
 
 export default function ArticleForm() {
-  const [formData, setFormData] = useState(articleState);
-  const { categories } = useSelector((state) => state.category); // array
+  const { mode, selectedFormData } = useSelector((state) => state.form);
+  const { categories } = useSelector((state) => state.category);
+
+  // Initialize with empty state first
+  const [formData, setFormData] = useState(initialForm);
 
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!categories || categories.length === 0) {
@@ -43,7 +44,20 @@ export default function ArticleForm() {
     }
   }, [dispatch]);
 
-  const handleChange = (e) => {
+  useEffect(() => {
+    if (mode === "edit" && selectedFormData) {
+      setFormData({
+        title: selectedFormData.title,
+        category: selectedFormData.category.name,
+        content: selectedFormData.content,
+        isPublished: selectedFormData.isPublished,
+      });
+    } else {
+      setFormData(initialForm);
+    }
+  }, [mode, selectedFormData]);
+
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -51,14 +65,11 @@ export default function ArticleForm() {
     }));
   };
 
-  const handleEditorChange = (editorState, editor) => {
-    editorState.read(() => {
-      const htmlString = $generateHtmlFromNodes(editor);
-      setFormData((prev) => ({
-        ...prev,
-        content: htmlString,
-      }));
-    });
+  const handleEditorChange = (value) => {
+    setFormData((prev) => ({
+      ...prev,
+      content: value,
+    }));
   };
 
   const handleCategoryChange = (value) => {
@@ -73,17 +84,26 @@ export default function ArticleForm() {
       ...formData,
       isPublished: publish,
     };
-    setFormData(updatedFormData);
+
+    // Add the article ID for updates
+    if (mode === "edit" && selectedFormData?._id) {
+      updatedFormData.id = selectedFormData._id;
+    }
+
     console.log("Submitting article:", updatedFormData);
-  
-    const result = await dispatch(createArticle(updatedFormData));
-    if(result.meta.requestStatus === 'fulfilled') {
-      toast.success("Article Created Successfully")
-      if (publish) { 
-        // dispatch(getPublishArticles());
-        navigate("/articles")
+    let result;
+    if (mode === "edit") {
+      result = await dispatch(updateArticle(updatedFormData));
+    } else {
+      result = await dispatch(createArticle(updatedFormData));
+    }
+    if (result.meta.requestStatus === "fulfilled") {
+      console.log("result", result);
+      if (publish) {
+        // navigate to newly created article
+        navigate(`/articles/${result.payload.slug}`);
       } else {
-        navigate("/dashboard/my-articles")
+        navigate("/dashboard/my-articles");
       }
     }
   };
@@ -94,7 +114,7 @@ export default function ArticleForm() {
         color="blue-gray"
         className="mb-4 text-4xl md:text-5xl font-bold"
       >
-        Create New Article
+        {mode === "edit" ? "Edit Article" : "Create New Article"}
       </Typography>
       <div className="container mx-auto px-4 py-8">
         <Card className="w-full max-w-4xl mx-auto border">
@@ -108,7 +128,7 @@ export default function ArticleForm() {
                   size="md"
                   name="title"
                   value={formData.title}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   placeholder="Enter article title"
                   className="focus:!border-gray-900 !border-[2px] !border-transparent ring-1 ring-blue-gray-200 placeholder:text-gray-500 placeholder:opacity-100 focus:ring-transparent"
                   labelProps={{
@@ -139,7 +159,10 @@ export default function ArticleForm() {
               <Typography variant="h6" color="blue-gray" className="mb-2">
                 Content
               </Typography>
-              <Editor onChange={handleEditorChange} />
+              <Editor
+                value={formData.content}
+                onChange={(newValue) => handleEditorChange(newValue)}
+              />
             </div>
           </CardBody>
 
@@ -149,14 +172,15 @@ export default function ArticleForm() {
               color="blue-gray"
               onClick={() => handleSubmit(false)}
             >
-              Save as Draft
+              {mode === "edit" ? "Update" : "Save as Draft"}
             </Button>
             <Button
               color="blue"
               onClick={() => handleSubmit(true)}
               className="flex items-center gap-2"
             >
-              <PencilIcon className="h-4 w-4" /> Publish
+              <PencilIcon className="h-4 w-4" />
+              {mode === "edit" ? "Update & Publish" : "Publish"}
             </Button>
           </CardFooter>
         </Card>

@@ -7,11 +7,6 @@ import {
   ListItemPrefix,
   ListItemSuffix,
   Chip,
-  Accordion,
-  AccordionHeader,
-  AccordionBody,
-  Alert,
-  Input,
   Drawer,
   Card,
 } from "@material-tailwind/react";
@@ -50,11 +45,11 @@ export function Sidebar() {
 
   return (
     <>
-      <div className="fixed bottom-10 left-5 z-50">
+      <div className="fixed bottom-10 left-5">
         <IconButton
           variant="filled"
           size="lg"
-          className="bg-blue-gray-300 rounded-full z-1000"
+          className="bg-blue-gray-300 rounded-full"
           onClick={() => setIsDrawerOpen(!isDrawerOpen)}
         >
           {isDrawerOpen ? (

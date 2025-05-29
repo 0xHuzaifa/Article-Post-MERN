@@ -92,16 +92,12 @@ export function ArticlesTable({ articles, isLoading, userArticles = false }) {
   const [selectedArticle, setSelectedArticle] = useState(null);
 
   const handleOpen = (type, article) => {
-    console.log("aaa");
     setModalType(type);
     setSelectedArticle(article);
     setOpen(true);
   };
 
   const handleClose = () => setOpen(false);
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const lastPostIndex = currentPage * postPerPage;
   const firstPostIndex = lastPostIndex - postPerPage;
@@ -229,7 +225,7 @@ export function ArticlesTable({ articles, isLoading, userArticles = false }) {
                           ) : (
                             <Tooltip content="View">
                               <a
-                                href={`/articles/${slug}`}
+                                href={`/articles/${article.slug}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >

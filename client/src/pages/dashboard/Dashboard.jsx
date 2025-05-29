@@ -61,6 +61,7 @@ export default function Dashboard() {
         >
           {isAdmin &&
             (loadingArticles ? (
+              <Card className="p-2">
               <div className="mt-6 max-w-full animate-pulse">
                 <Typography
                   as="div"
@@ -84,6 +85,7 @@ export default function Dashboard() {
                   &nbsp;
                 </Typography>
               </div>
+              </Card>
             ) : (
               <Card className="mt-6 text-nowrap">
                 <CardBody>
@@ -98,6 +100,7 @@ export default function Dashboard() {
             ))}
 
           {loadingArticles ? (
+            <Card className="p-2">
             <div className="mt-6 max-w-full animate-pulse">
               <Typography
                 as="div"
@@ -122,6 +125,7 @@ export default function Dashboard() {
                 &nbsp;
               </Typography>
             </div>
+            </Card>
           ) : (
             <Card className="mt-6 text-nowrap">
               <CardBody>
@@ -136,6 +140,7 @@ export default function Dashboard() {
           )}
 
           {loadingArticles ? (
+            <Card className="p-2">
             <div className="mt-6 max-w-full animate-pulse">
               <Typography
                 as="div"
@@ -160,6 +165,7 @@ export default function Dashboard() {
                 &nbsp;
               </Typography>
             </div>
+            </Card>
           ) : (
             <Card className="mt-6 text-nowrap">
               <CardBody>
@@ -176,6 +182,7 @@ export default function Dashboard() {
           {/* Categories */}
           {isAdmin &&
             (loadingCategories ? (
+              <Card className="p-2">
               <div className="mt-6 max-w-full animate-pulse">
                 <Typography
                   as="div"
@@ -200,6 +207,7 @@ export default function Dashboard() {
                   &nbsp;
                 </Typography>
               </div>
+              </Card>
             ) : (
               <Card className="mt-6 text-nowrap">
                 <CardBody>

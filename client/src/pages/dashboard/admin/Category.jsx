@@ -20,8 +20,6 @@ export default function Category() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
- 
-
   const handleCreateCategory = () => {
     dispatch(setFormMode("create"));
     dispatch(setSelectedFormData(null));
@@ -34,7 +32,7 @@ export default function Category() {
         <Typography variant="h1" className="mb-8">
           Categories
         </Typography>
-        <div className="w-full flex justify-end mx-3 mb-5">
+        <div className="w-full flex justify-end mx-3 mb-16">
           <Button
             variant="gradient"
             onClick={handleCreateCategory}

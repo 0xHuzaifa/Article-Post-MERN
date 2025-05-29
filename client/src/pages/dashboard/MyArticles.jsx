@@ -18,6 +18,7 @@ import { ArticlesTable } from "@/components/articles/ArticlesTable";
 import { useNavigate } from "react-router-dom";
 import { ScrollText } from "lucide-react";
 import { getMyArticles } from "../../redux/slices/articleSlice";
+import { setFormMode, setSelectedFormData } from "../../redux/slices/formSlice";
 
 const tabsData = [
   { label: "Publish", value: "publish" },
@@ -53,6 +54,12 @@ export default function MyArticles() {
     setActiveTab(value);
   };
 
+  const handleCreateArticle = () => {
+    dispatch(setFormMode("create"));
+    dispatch(setSelectedFormData(null));
+    navigate("/dashboard/create-article");
+  };
+
   return (
     <div className="w-full bg-blue-gray-50 min-h-screen">
       <div className="container mx-auto px-4 md:px-8 py-3 md:py-7">
@@ -62,7 +69,7 @@ export default function MyArticles() {
         <div className="w-full flex justify-end mx-3 mb-5">
           <Button
             variant="gradient"
-            onClick={() => navigate("/dashboard/create-article")}
+            onClick={handleCreateArticle}
             className="flex justify-between items-center gap-2"
           >
             <ScrollText />

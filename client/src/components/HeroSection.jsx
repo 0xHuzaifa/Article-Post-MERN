@@ -1,12 +1,15 @@
 import { Chip, Typography } from "@material-tailwind/react";
 import React from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 const HeroSection = () => {
+  const { isLogin } = useSelector((state) => state.auth);
+
   return (
     <section className="w-full relative bg-gray-900 text-white">
       {/* Hero container */}
-      <div className="container mx-auto px-4 py-16 md:py-24 lg:py-32">
+      <div className="container mx-auto px-4 pt-28 pb-16">
         <div className="max-w-4xl mx-auto text-center">
           {/* Eyebrow text */}
           <Chip
@@ -34,12 +37,14 @@ const HeroSection = () => {
             >
               Start Reading
             </Link>
-            <Link
-              to="/signup"
-              className="px-6 py-3 bg-transparent hover:bg-white/10 text-white font-medium rounded-lg border border-white/20 transition-colors duration-200"
-            >
-              SignUp
-            </Link>
+            {!isLogin && (
+              <Link
+                to="/signup"
+                className="px-6 py-3 bg-transparent hover:bg-white/10 text-white font-medium rounded-lg border border-white/20 transition-colors duration-200"
+              >
+                SignUp
+              </Link>
+            )}
           </div>
         </div>
       </div>

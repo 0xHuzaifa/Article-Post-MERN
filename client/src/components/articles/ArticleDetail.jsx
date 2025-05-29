@@ -3,7 +3,6 @@ import {
   Card,
   CardBody,
   CardHeader,
-  CardFooter,
   Chip,
   Breadcrumbs,
 } from "@material-tailwind/react";
@@ -110,9 +109,6 @@ export default function ArticleDetailPage() {
           <div className="flex items-center gap-4 mb-6">
             <div>
               <Typography variant="h6">{article?.author?.username}</Typography>
-              {/* <Typography variant="small" color="gray" className="font-normal">
-                {article?.author.email}
-              </Typography> */}
             </div>
           </div>
         </CardHeader>
