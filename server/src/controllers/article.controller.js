@@ -94,6 +94,7 @@ const updateArticle = asyncHandler(async (req, res) => {
 const deleteArticle = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const userId = req.user?.id;
+  const userRole = req.user?.role;
 
   const article = await Article.findById(id);
   if (!article) {
@@ -101,7 +102,9 @@ const deleteArticle = asyncHandler(async (req, res) => {
   }
 
   if (article.author.toString() !== userId.toString()) {
-    throw new ApiError(403, "You are not authorized to delete this article");
+    if (userRole !== "admin") {
+      throw new ApiError(403, "You are not authorized to delete this article");
+    }
   }
 
   await Article.findByIdAndDelete(id);
@@ -199,6 +202,10 @@ const getPublishedArticles = asyncHandler(async (req, res) => {
       },
     },
   ]);
+
+  if (articles.length === 0) {
+    throw new ApiError(404, "Articles not found");
+  }
 
   res.json(new ApiResponse(200, "Published articles", articles));
 });
