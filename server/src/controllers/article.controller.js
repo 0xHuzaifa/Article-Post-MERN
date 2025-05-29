@@ -9,7 +9,7 @@ const createArticle = asyncHandler(async (req, res) => {
   const { title, category, content, isPublished } = req.body;
   const author = req.user?.id; // req.user is set by isLogin middleware
 
-  if (!title || !category || !content || typeof isPublished !== 'boolean') {
+  if (!title || !category || !content || typeof isPublished !== "boolean") {
     throw new ApiError(400, "All fields are required");
   }
 
@@ -37,9 +37,13 @@ const createArticle = asyncHandler(async (req, res) => {
     isPublished,
   });
 
-  const populatedArticle = await Article.findById(article._id).populate("author", 'username').populate("category", 'name')
+  const populatedArticle = await Article.findById(article._id)
+    .populate("author", "username")
+    .populate("category", "name");
 
-  res.status(201).json(new ApiResponse(201, "Article created", article));
+  res
+    .status(201)
+    .json(new ApiResponse(201, "Article created", populatedArticle));
 });
 
 // Update an article

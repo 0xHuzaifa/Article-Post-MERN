@@ -1,4 +1,5 @@
 import Category from "../models/Category.model.js";
+import Article from "../models/Article.model.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
@@ -69,10 +70,30 @@ const deleteCategory = asyncHandler(async (req, res) => {
     throw new ApiError(403, "You are not authorized to delete this category");
   }
 
-  await Category.findByIdAndDelete(id);
+  const unCategorized = getUnCategorized()
+  await Article.updateMany(
+    {category: category._id},
+    {category: unCategorized._id}
+  )
+
+  await Category.findByIdAndDelete(category._id);
 
   res.json(new ApiResponse(200, "Category deleted"));
 });
+
+// Get unCategorized
+const getUnCategorized = asyncHandler(async(req, res) => {
+  let unCategorized = await Category.findOne({name: "Un-Categorized"});
+  if(!unCategorized) {
+    unCategorized = new Category({
+      name: "Un-Categorized",
+      description: "no category",
+      author: req.user.id
+    })
+    await unCategorized.save()
+  }
+  return unCategorized
+})
 
 // Get a specific category by slug
 const getSpecificCategory = asyncHandler(async (req, res) => {
