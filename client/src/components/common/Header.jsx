@@ -10,13 +10,20 @@ import {
   Collapse,
 } from "@material-tailwind/react";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "@/redux/slices/authSlice";
 
 export default function Header() {
-  const [openNav, setOpenNav] = useState(false);
-  const navigate = useNavigate();
-
   const { isLogin } = useSelector((state) => state.auth);
+
+  const [openNav, setOpenNav] = useState(false);
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
 
   const navItems = [
     { label: "Home", href: "/" },
@@ -81,6 +88,14 @@ export default function Header() {
               >
                 <span>Dashboard</span>
               </Button>
+              <Button
+                variant="text"
+                size="sm"
+                className="hidden lg:inline-block"
+                onClick={handleLogout}
+              >
+                <span>Logout</span>
+              </Button>
             </div>
           ) : (
             <div className="flex items-center gap-x-1">
@@ -124,8 +139,21 @@ export default function Header() {
         <div className="px-2">{navList}</div>
         {isLogin ? (
           <div className="flex items-center justify-center gap-x-1 font-semibold px-3 pb-5">
-            <Button fullWidth size="sm" onClick={() => navigate("/dashboard")}>
+            <Button
+              fullWidth
+              variant="gradient"
+              size="sm"
+              onClick={() => navigate("/dashboard")}
+            >
               <span>Dashboard</span>
+            </Button>
+            <Button
+              fullWidth
+              variant="outlined"
+              size="sm"
+              onClick={() => navigate("/dashboard")}
+            >
+              <span>Logout</span>
             </Button>
           </div>
         ) : (

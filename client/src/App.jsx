@@ -28,8 +28,9 @@ import {
   PrivateRoute,
   GuestOnlyRoute,
 } from "./auth/RoleProtection";
-import { authMe } from "./redux/slices/authSlice";
+import { authMe } from "@/redux/slices/authSlice";
 import LoadingScreen from "@/components/common/LoadingScreen";
+import { Profile } from "@/pages/dashboard/Profile";
 
 function App() {
   const { publishArticles } = useSelector((state) => state.article);
@@ -93,6 +94,8 @@ function App() {
               element={<ArticleForm />}
             />
             <Route path="/dashboard/my-articles" element={<MyArticles />} />
+
+            <Route path="/dashboard/profile" element={<Profile />} />
           </Route>
 
           {/* Private Routes only for Admin */}

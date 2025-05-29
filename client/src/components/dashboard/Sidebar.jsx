@@ -45,7 +45,7 @@ export function Sidebar() {
 
   return (
     <>
-      <div className="fixed bottom-10 left-5">
+      <div className="fixed bottom-10 left-5 z-50">
         <IconButton
           variant="filled"
           size="lg"
@@ -168,12 +168,18 @@ export function Sidebar() {
 
             <hr className="my-2 border-blue-gray-50" />
 
-            <ListItem>
+            <ListItem
+              onClick={() => {
+                navigate("/dashboard/profile");
+                closeDrawer();
+              }}
+            >
               <ListItemPrefix>
                 <UserCircleIcon className="h-5 w-5" />
               </ListItemPrefix>
               Profile
             </ListItem>
+
             <ListItem onClick={handleLogout}>
               <ListItemPrefix>
                 <PowerIcon className="h-5 w-5" />
