@@ -1,0 +1,8 @@
+.toolbar .relative.w-full {
+    width: auto !important;
+    min-width: 0 !important;
+    display: inline-flex !important;
+    vertical-align: middle;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
