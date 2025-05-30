@@ -14,7 +14,7 @@ import NotFound from "./pages/NotFound";
 
 // components
 import ArticleForm from "@/components/articles/ArticleForm";
-import Layout from "@/components/layout/layout";
+import Layout from "@/components/layout/Layout";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import ArticleDetail from "@/components/articles/ArticleDetail";
 import CategoryForm from "@/components/categories/CategoryForm";
