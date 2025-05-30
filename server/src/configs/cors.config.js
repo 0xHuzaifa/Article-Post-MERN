@@ -3,7 +3,7 @@ import cors from "cors";
 const corsConfig = () => {
   return cors({
     origin: (origin, callback) => {
-      const allowedOrigin = ["http://localhost:3000", "http://localhost:5173"];
+      const allowedOrigin = ["http://localhost:3000", "http://localhost:5173", "https://article-post.netlify.app"];
       if (!origin || allowedOrigin.indexOf(origin) !== -1) {
         callback(null, true); // allow the request
       } else {
