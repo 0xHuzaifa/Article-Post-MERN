@@ -3,22 +3,19 @@
 import { useState, useEffect } from "react";
 import {
   Card,
-  CardHeader,
   CardBody,
   CardFooter,
   Typography,
   Input,
-  Textarea,
   Button,
   Select,
   Option,
 } from "@material-tailwind/react";
-import { DocumentTextIcon, PencilIcon } from "@heroicons/react/24/solid";
+import { PencilIcon } from "@heroicons/react/24/solid";
 import { Editor } from "@/components/lexical/Editor";
 import { getAllCategories } from "../../redux/slices/categorySlice";
 import { useDispatch, useSelector } from "react-redux";
 import { createArticle, updateArticle } from "../../redux/slices/articleSlice";
-import { $generateHtmlFromNodes } from "@lexical/html";
 import { useNavigate } from "react-router-dom";
 
 const initialForm = {
@@ -31,9 +28,11 @@ const initialForm = {
 export default function ArticleForm() {
   const { mode, selectedFormData } = useSelector((state) => state.form);
   const { categories } = useSelector((state) => state.category);
+  const { isLoading } = useSelector((state) => state.article);
 
   // Initialize with empty state first
   const [formData, setFormData] = useState(initialForm);
+  const [clickedButton, setClickedButton] = useState("");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -80,6 +79,7 @@ export default function ArticleForm() {
   };
 
   const handleSubmit = async (publish) => {
+    setClickedButton(publish ? "publish" : "draft");
     const updatedFormData = {
       ...formData,
       isPublished: publish,
@@ -171,13 +171,18 @@ export default function ArticleForm() {
               variant="outlined"
               color="blue-gray"
               onClick={() => handleSubmit(false)}
+              className="flex items-center gap-2 disabled:opacity-50"
+              loading={isLoading && clickedButton === "draft"}
+              disabled={isLoading}
             >
               {mode === "edit" ? "Update" : "Save as Draft"}
             </Button>
             <Button
               color="blue"
               onClick={() => handleSubmit(true)}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 disabled:opacity-50"
+              loading={isLoading && clickedButton === "publish"}
+              disabled={isLoading}
             >
               <PencilIcon className="h-4 w-4" />
               {mode === "edit" ? "Update & Publish" : "Publish"}

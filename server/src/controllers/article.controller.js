@@ -5,7 +5,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 // Create a new article
-const createArticle = asyncHandler(async (req, res) => {
+const createArticle = asyncHandler(async (req, res, next) => {
   const { title, category, content, isPublished } = req.body;
   const author = req.user?.id; // req.user is set by isLogin middleware
 
@@ -47,7 +47,7 @@ const createArticle = asyncHandler(async (req, res) => {
 });
 
 // Update an article
-const updateArticle = asyncHandler(async (req, res) => {
+const updateArticle = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const { title, category, content, isPublished } = req.body;
   const userId = req.user?.id;
@@ -91,7 +91,7 @@ const updateArticle = asyncHandler(async (req, res) => {
 });
 
 // Delete an article
-const deleteArticle = asyncHandler(async (req, res) => {
+const deleteArticle = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const userId = req.user?.id;
   const userRole = req.user?.role;
@@ -113,7 +113,7 @@ const deleteArticle = asyncHandler(async (req, res) => {
 });
 
 // Get articles by current user
-const getMyArticles = asyncHandler(async (req, res) => {
+const getMyArticles = asyncHandler(async (req, res, next) => {
   const userId = req.user?.id;
 
   const articles = await Article.find({ author: userId })
@@ -124,7 +124,7 @@ const getMyArticles = asyncHandler(async (req, res) => {
   res.json(new ApiResponse(200, "My articles", articles));
 });
 
-const getSpecificArticle = asyncHandler(async (req, res) => {
+const getSpecificArticle = asyncHandler(async (req, res, next) => {
   const { slug } = req.params;
   const article = await Article.findOne({ slug })
     .populate("category", "name _id")
@@ -136,7 +136,7 @@ const getSpecificArticle = asyncHandler(async (req, res) => {
 });
 
 // Get all published articles, public route
-const getAllArticles = asyncHandler(async (req, res) => {
+const getAllArticles = asyncHandler(async (req, res, next) => {
   const articles = await Article.aggregate([
     { $sort: { createdAt: -1 } },
     {
@@ -170,7 +170,7 @@ const getAllArticles = asyncHandler(async (req, res) => {
   res.json(new ApiResponse(200, "All articles", articles));
 });
 // Get all published articles, public route
-const getPublishedArticles = asyncHandler(async (req, res) => {
+const getPublishedArticles = asyncHandler(async (req, res, next) => {
   const articles = await Article.aggregate([
     { $match: { isPublished: true } },
     { $sort: { createdAt: -1 } },
@@ -191,13 +191,23 @@ const getPublishedArticles = asyncHandler(async (req, res) => {
       },
     },
     {
+      $addFields: {
+        category: { $first: "$category" },
+        author: { $arrayElemAt: ["$author", 0] },
+      },
+    },
+    {
       $project: {
         title: 1,
         content: 1,
         slug: 1,
         isPublished: 1,
-        category: { $arrayElemAt: ["$category", 0] },
-        author: { $arrayElemAt: ["$author", 0] },
+        "category.name": 1,
+        "category.description": 1,
+        "category._id": 1,
+        "author.username": 1,
+        "author._id": 1,
+        "author.email": 1,
         createdAt: 1,
       },
     },
@@ -211,7 +221,7 @@ const getPublishedArticles = asyncHandler(async (req, res) => {
 });
 
 // Get all unpublished articles by current user
-const getUnpublishedArticles = asyncHandler(async (req, res) => {
+const getUnpublishedArticles = asyncHandler(async (req, res, next) => {
   const currentUser = req.user.id.toString();
   const articles = await Article.aggregate([
     { $match: { isPublished: false, author: currentUser } },

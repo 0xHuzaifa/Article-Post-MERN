@@ -61,9 +61,9 @@ export default function Home() {
   }, [publishArticles]);
 
   return (
-    <div className="h-[1000px]">
+    <div className="w-full h-full">
       <HeroSection />
-      <div className="w-full bg-blue-gray-50 px-5">
+      <div className="w-full h-full bg-blue-gray-50 px-5">
         <Typography className="pt-14 text-xl md:text-4xl font-bold">
           Latest Articles
         </Typography>
@@ -76,6 +76,7 @@ export default function Home() {
                 title={article.title}
                 category={article.category.name}
                 content={article.content}
+                slug={article.slug}
               />
             ))}
           </div>

@@ -40,31 +40,24 @@ const theme = {
   },
 };
 
-
-
-export const Editor = React.memo(
-  function Editor({ value, onChange }) {
-
-    const initialConfig = useMemo(() => ({
+export const Editor = React.memo(function Editor({ value, onChange }) {
+  const initialConfig = useMemo(
+    () => ({
       namespace: "MyEditor",
       theme,
       onError(error) {
         console.error(error);
       },
-      nodes: [
-        HeadingNode,
-        CodeNode,
-        CodeHighlightNode,
- 
-      ],
-    }), []);
-
+      nodes: [HeadingNode, CodeNode, CodeHighlightNode],
+    }),
+    []
+  );
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
       <div className="editor-container">
         <ToolbarPlugin />
-        <div className="editor-inner">
+        <div className="editor-inner max-h-48 overflow-y-auto">
           <RichTextPlugin
             contentEditable={<ContentEditable className="editor-input" />}
             placeholder={<Placeholder />}

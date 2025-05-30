@@ -71,7 +71,7 @@ const deleteCategory = createAsyncThunk(
       const response = await api.delete(`/category/delete-category/${id}`);
       return id;
     } catch (error) {
-      console.log("ccc", error.response);
+      console.log("ccc", error);
       const message =
         error?.response?.data?.message ||
         error?.response?.message ||

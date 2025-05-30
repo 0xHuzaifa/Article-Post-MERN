@@ -10,11 +10,13 @@ import {
 
 import { deleteCategory } from "../../redux/slices/categorySlice";
 import { setFormMode, setSelectedFormData } from "../../redux/slices/formSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
 export function CategoryModel({ handleOpen, open, type, category }) {
   if (!category) return null;
+
+  const { isLoading } = useSelector((state) => state.category);
 
   const isEdit = type === "edit";
   const title = isEdit ? "Edit Category" : "Delete Category";
@@ -54,11 +56,25 @@ export function CategoryModel({ handleOpen, open, type, category }) {
           <span>Cancel</span>
         </Button>
         {isEdit ? (
-          <Button onClick={handleSubmit} variant="gradient" color="blue">
+          <Button
+            onClick={handleSubmit}
+            loading={isLoading}
+            disabled={isLoading}
+            className="disabled:opacity-50"
+            variant="gradient"
+            color="blue"
+          >
             <span>Update</span>
           </Button>
         ) : (
-          <Button onClick={handleSubmit} variant="gradient" color="red">
+          <Button
+            onClick={handleSubmit}
+            loading={isLoading}
+            disabled={isLoading}
+            className="disabled:opacity-50"
+            variant="gradient"
+            color="red"
+          >
             <span>Delete</span>
           </Button>
         )}

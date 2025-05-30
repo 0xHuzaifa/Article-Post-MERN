@@ -11,6 +11,7 @@ const initialProfile = {
 
 export function Profile() {
   const { user } = useSelector((state) => state.auth);
+  console.log("user", user)
 
   const [userProfile, setUserProfile] = useState(initialProfile);
 

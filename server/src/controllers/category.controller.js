@@ -5,7 +5,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
 // Create a new category
-const createCategory = asyncHandler(async (req, res) => {
+const createCategory = asyncHandler(async (req, res, next) => {
   const { name, description } = req.body;
   const author = req.user?.id;
 
@@ -27,7 +27,7 @@ const createCategory = asyncHandler(async (req, res) => {
 });
 
 // Update a category
-const updateCategory = asyncHandler(async (req, res) => {
+const updateCategory = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const { name, description } = req.body;
   const userId = req.user?.id;
@@ -57,7 +57,7 @@ const updateCategory = asyncHandler(async (req, res) => {
 });
 
 // Delete a category
-const deleteCategory = asyncHandler(async (req, res) => {
+const deleteCategory = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const userId = req.user?.id;
 
@@ -70,11 +70,11 @@ const deleteCategory = asyncHandler(async (req, res) => {
     throw new ApiError(403, "You are not authorized to delete this category");
   }
 
-  const unCategorized = getUnCategorized()
+  const unCategorized = await getUnCategorized(req);
   await Article.updateMany(
-    {category: category._id},
-    {category: unCategorized._id}
-  )
+    { category: category._id },
+    { category: unCategorized._id }
+  );
 
   await Category.findByIdAndDelete(category._id);
 
@@ -82,21 +82,21 @@ const deleteCategory = asyncHandler(async (req, res) => {
 });
 
 // Get unCategorized
-const getUnCategorized = asyncHandler(async(req, res) => {
-  let unCategorized = await Category.findOne({name: "Un-Categorized"});
-  if(!unCategorized) {
+const getUnCategorized = async (req) => {
+  let unCategorized = await Category.findOne({ name: "Un-Categorized" });
+  if (!unCategorized) {
     unCategorized = new Category({
       name: "Un-Categorized",
       description: "no category",
-      author: req.user.id
-    })
-    await unCategorized.save()
+      author: req.user.id,
+    });
+    await unCategorized.save();
   }
-  return unCategorized
-})
+  return unCategorized;
+};
 
 // Get a specific category by slug
-const getSpecificCategory = asyncHandler(async (req, res) => {
+const getSpecificCategory = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const category = await Category.findOne({ _id: id }).populate(
     "author",
@@ -109,7 +109,7 @@ const getSpecificCategory = asyncHandler(async (req, res) => {
 });
 
 // Get all categories
-const getAllCategories = asyncHandler(async (req, res) => {
+const getAllCategories = asyncHandler(async (req, res, next) => {
   const categories = await Category.find();
   res.json(new ApiResponse(200, "Categories retrieved", categories));
 });

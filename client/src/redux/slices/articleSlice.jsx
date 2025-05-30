@@ -5,9 +5,7 @@ import { toast } from "react-toastify";
 const initialState = {
   isLoading: false,
   isError: false,
-  articles: [],
   publishArticles: [],
-  draftArticles: [],
   userArticles: [],
   userDraftArticles: [],
 };
@@ -34,7 +32,7 @@ const getMyArticles = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await api.get("/article/my-articles");
-      console.log("my artciles", res);
+      console.log("my articles", res);
       return res.data.data;
     } catch (error) {
       console.log("my artciles error", error.response);
@@ -56,11 +54,11 @@ const getPublishArticles = createAsyncThunk(
       console.log("publish articles", res);
       return res.data.data;
     } catch (error) {
-      console.log("my artciles error", error.response);
+      console.log("published articles error", error.response);
       const message =
         error?.response?.data?.message ||
         error?.response?.message ||
-        "Error while getting all articles";
+        "Error while getting published articles";
       toast.error(message);
       return rejectWithValue(message);
     }
@@ -73,7 +71,7 @@ const createArticle = createAsyncThunk(
     try {
       const res = await api.post("/article/create-article", formData);
       console.log("create artciles", res);
-      toast.success("Article Created Successfully")
+      toast.success("Article Created Successfully");
       return res.data.data;
     } catch (error) {
       console.log("create articles error", error);
@@ -112,7 +110,7 @@ const updateArticle = createAsyncThunk(
     try {
       const res = await api.put(`/article/update-article/${data.id}`, data);
       console.log("update article", res);
-      toast.success("Article Updated Successfully")
+      toast.success("Article Updated Successfully");
       return res.data.data;
     } catch (error) {
       console.log("update article error", error);
@@ -260,18 +258,29 @@ const articleSlice = createSlice({
         state.isError = false;
       })
       .addCase(updateArticle.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.isError = false;
-        const updateArticle = action.payload;
-        state.publishArticles = state.publishArticles.filter((article) =>
-          article._id === updateArticle._id ? updateArticle : article
+        const updatedArticle = action.payload;
+        const articleId = updatedArticle._id;
+
+        // Remove the article from all arrays first (handles all scenarios)
+        state.publishArticles = state.publishArticles.filter(
+          (article) => article._id !== articleId
         );
-        state.userArticles = state.userArticles.filter((article) =>
-          article._id === updateArticle._id ? updateArticle : article
+        state.userArticles = state.userArticles.filter(
+          (article) => article._id !== articleId
         );
-        state.userDraftArticles = state.userArticles.filter((article) =>
-          article._id === updateArticle._id ? updateArticle : article
+        state.userDraftArticles = state.userDraftArticles.filter(
+          (article) => article._id !== articleId
         );
+
+        // Add the updated article to appropriate arrays based on publish status
+        if (updatedArticle.isPublished) {
+          // If article is published, add to both publishArticles and userArticles
+          state.publishArticles.unshift(updatedArticle);
+          state.userArticles.unshift(updatedArticle);
+        } else {
+          // If article is not published, add only to userDraftArticles
+          state.userDraftArticles.push(updatedArticle);
+        }
       })
       .addCase(updateArticle.rejected, (state) => {
         state.isLoading = false;

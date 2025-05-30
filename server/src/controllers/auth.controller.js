@@ -13,7 +13,7 @@ const options = {
 };
 
 // Register
-const register = asyncHandler(async (req, res) => {
+const register = asyncHandler(async (req, res, next) => {
   const { username, email, password } = req.body;
 
   if (!username || !email || !password) {
@@ -31,7 +31,7 @@ const register = asyncHandler(async (req, res) => {
 });
 
 // Login
-const login = asyncHandler(async (req, res) => {
+const login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -61,14 +61,14 @@ const login = asyncHandler(async (req, res) => {
       new ApiResponse(200, "login successful", {
         id: user._id,
         email: user.email,
-        user: user.username,
+        username: user.username,
         role: user.role,
       })
     );
 });
 
 // Logout
-const logout = asyncHandler(async (req, res) => {
+const logout = asyncHandler(async (req, res, next) => {
   await User.findByIdAndUpdate(
     req.user.id,
     {
@@ -84,7 +84,7 @@ const logout = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Logout successful"));
 });
 
-const refreshAccessToken = asyncHandler(async (req, res) => {
+const refreshAccessToken = asyncHandler(async (req, res, next) => {
   try {
     // Check if refreshToken exists in cookies or body with proper null handling
     const incomingRefreshToken = 
@@ -130,7 +130,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   }
 });
 
-const authMe = asyncHandler(async (req, res) => {
+const authMe = asyncHandler(async (req, res, next) => {
   const {id} = req.user;
   const user =  await User.findById(id);
   if (!user) {
