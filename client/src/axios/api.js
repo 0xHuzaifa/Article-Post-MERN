@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseURL = "http://localhost:3000/api/v1";
+const baseURL = "https://article-post-backend.vercel.app/api/v1";
 
 const api = axios.create({
   baseURL,
@@ -12,7 +12,7 @@ const publicRoutes = [
   "/auth/login",
   "/auth/register",
   "/auth/refresh",
-  "/articles/published-articles"
+  "/article/published-articles"
   // Add other public endpoints as needed
 ];
 
